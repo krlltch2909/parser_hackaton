@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+# брокер сообщений
+  redis:
+    container_name: redis
+    restart: always
+    image: redis
+
+# база данных
+  postgres:
+      container_name: postgres
+      image: postgres
+      env_file:
+        - ./app/.env
+      volumes:
+        - ./app/postgres/data/:/var/lib/postgresql/data/
+
+# основной сервер
+  server:
+    container_name: server
+    restart: always
+    build:
+      context: app/
+    env_file:
+      - ./app/.env
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - postgres
+
+# worker для асинхронной работы и исполнения переодических задач
+  worker:
+    container_name: celery_worker
+    restart: always
+    build:
+      context: app/
+    env_file:
+      - ./app/.env
+    command: >
+      sh -c "celery -A app worker -l INFO"
+    depends_on:
+      - postgres
+
+# worker для назначения переодических задач
+  celery_beats:
+    container_name: celery_beats_worker
+    restart: always
+    build:
+      context: app/
+    env_file:
+      - ./app/.env
+    command: >
+      sh -c " celery -A app beat -l INFO
+      --scheduler django_celery_beat.schedulers:DatabaseScheduler"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres:

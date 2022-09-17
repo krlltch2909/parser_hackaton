@@ -1,0 +1,15 @@
+.git
+.gitignore
+
+.docker
+
+*/__pycache__/
+**/__pycache__/
+
+
+.idea/
+.env/
+.venv/
+venv/
+
+postgres/
