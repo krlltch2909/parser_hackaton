@@ -2,14 +2,20 @@
 .gitignore
 
 .docker
+.dockerignore
 
 */__pycache__/
 **/__pycache__/
 
+.idea/
+.env/
 
 .idea/
 .env/
 .venv/
 venv/
+
+.DS_Store/
+.env
 
 postgres/
