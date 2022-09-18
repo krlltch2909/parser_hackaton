@@ -20,6 +20,6 @@ from main.views import TitleAPIView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/hackaton/', TitleAPIView.as_view()),
-    path('api/auth/', include('djoser.urls')),
-    re_path('api/auth/', include('djoser.urls.authtoken')),
-]
+    path('api/auth/', include('djoser.urls')),                  # подключение джосера для регистрации, авторизации, получения токена
+    re_path('api/auth/', include('djoser.urls.authtoken')),     # 
+]                                                               # все url(пути): https://djoser.readthedocs.io/en/latest/base_endpoints.html
