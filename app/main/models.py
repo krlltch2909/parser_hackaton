@@ -27,8 +27,8 @@ class Event(models.Model):
 
     address = models.CharField(max_length=255, blank=True)
 
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateField(blank=True)
+    end_date = models.DateField(blank=True)
 
     url = models.CharField(max_length=255)
 
