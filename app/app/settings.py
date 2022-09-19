@@ -12,6 +12,13 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+import django
+import os
+
+import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
@@ -26,7 +33,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG')
+DEBUG = os.environ.get('DEBUG', default=True)
 
 ALLOWED_HOSTS = ['*']
 
@@ -40,13 +47,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_celery_beat',
+    'django.contrib.sites',
 
+    'main',
+
+    'django_celery_beat',
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
-    'main'
 ]
+
+SITE_ID = 0
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -97,6 +108,13 @@ DATABASES = {
 }
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -126,6 +144,7 @@ TIME_ZONE = 'UTC' # 'Europe/Moscow'
 USE_I18N = True
 
 USE_TZ = True
+
 
 
 # Static files (CSS, JavaScript, Images)

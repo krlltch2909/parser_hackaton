@@ -1,6 +1,9 @@
 from django.db import models
 
 
+# Create your models here.
+
+
 # классификатор типов события
 class EventTypeClissifier(models.Model):
     type_code = models.SmallIntegerField(primary_key=True)
