@@ -15,9 +15,9 @@ def get_leaders_of_digital_events():
         event.title = raw_event["name"]
         event.description = raw_event["description"]
         raw_event_start_date = raw_event["start_date"]
-        event.start_date = datetime.fromisoformat(raw_event_start_date[:len(raw_event_start_date) - 1])
+        event.start_date = datetime.fromisoformat(raw_event_start_date)
         raw_event_end_date = raw_event["end_date"]
-        event.end_date = datetime.fromisoformat(raw_event_end_date[:len(raw_event_start_date) - 1])
+        event.end_date = datetime.fromisoformat(raw_event_end_date)
         event.url = f'https://leadersofdigital.ru/event/{raw_event["event_id"]}'
         event.img = raw_event["avatar_big_url"]
         event.type_of_event = EventTypeClissifier.objects.get(id=2) # hackaton
