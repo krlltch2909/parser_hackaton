@@ -32,6 +32,7 @@ class Event(models.Model):
     end_date = models.DateTimeField(blank=True)
 
     url = models.URLField(max_length=255)
+    img = models.URLField(max_length=255)
 
     type_of_event = models.ForeignKey(EventTypeClissifier, on_delete=models.DO_NOTHING)
     status_of_event = models.ForeignKey(StatusOfEvent, on_delete=models.DO_NOTHING)
