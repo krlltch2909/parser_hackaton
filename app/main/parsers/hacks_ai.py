@@ -5,7 +5,10 @@ from utils import get_event_status_based_on_date
 
 
 def get_hacks_ai_events():
-    response = requests.get("https://hacks-ai.ru/api/v2/hackathons/cards")
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    response = requests.get("https://hacks-ai.ru/api/v2/hackathons/cards", headers=headers)
     data = response.json()
     events = []
     raw_events = _add_type(data["district"], "hackathons")
@@ -13,7 +16,7 @@ def get_hacks_ai_events():
     raw_events.extend(_add_type(data["federal"], "championships"))
 
     for raw_event in raw_events:
-        event = Event.objects.create()
+        event = Event()
         _fill_event(event, int(raw_event["id"]), raw_event["type"], raw_event["status"])
         events.append(event)
 
@@ -55,13 +58,13 @@ def _fill_event(event, event_id, event_type, event_status):
 
     if event_type == "hackatons":
         event.title = "Хакатон"
-        event.type_of_event = EventTypeClissifier.objects.get(id=2) # hackaton
+        event.type_of_event = EventTypeClissifier.objects.get(type_code=2) # hackaton
     else:
         event.title = "Чемпионат"
-        event.type_of_event = EventTypeClissifier.objects.get(id=6) # championship    
+        event.type_of_event = EventTypeClissifier.objects.get(type_code=6) # championship    
     
     if event_status == "registration":
-        event.status_of_event = StatusOfEvent.objects.get(id=4) # registration
+        event.status_of_event = StatusOfEvent.objects.get(status_code=4) # registration
     else:
         event.status_of_event = get_event_status_based_on_date(event)
 
