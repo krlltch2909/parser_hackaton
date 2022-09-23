@@ -13,8 +13,12 @@ services:
       image: postgres
       env_file:
         - ./app/.env
+      environment:
+          PGDATA: /var/lib/postgresql/data/db/
       volumes:
-        - ./app/postgres/data/:/var/lib/postgresql/data/
+        - ./app/postgres:/var/lib/postgresql/data/
+#      volumes:
+#        - ./app/postgres/data/:/var/lib/postgresql/data/
 
 # основной сервер
   server:
@@ -28,6 +32,7 @@ services:
       - "8000:8000"
     command: >
       sh -c "python manage.py migrate &&
+      python manage.py initializedb &&
       python manage.py runserver 0.0.0.0:8000"
     depends_on:
       - postgres
@@ -43,7 +48,7 @@ services:
     command: >
       sh -c "celery -A app worker -l INFO"
     depends_on:
-      - postgres
+      - server
 
 # worker для назначения переодических задач
   celery_beats:
@@ -57,7 +62,7 @@ services:
       sh -c " celery -A app beat -l INFO
       --scheduler django_celery_beat.schedulers:DatabaseScheduler"
     depends_on:
-      - postgres
+      - server
 
 volumes:
   postgres:
