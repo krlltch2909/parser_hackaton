@@ -47,17 +47,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
-
+    # 'django.contrib.sites',
+    'django_celery_beat',
     'main',
 
-    'django_celery_beat',
+
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
 ]
 
-SITE_ID = 0
+# SITE_ID = 0
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -94,26 +94,26 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 #
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#
-#         'HOST': os.environ.get('POSTGRES_HOST'),
-#         'PORT': '5432',
-#         'USER': os.environ.get('POSTGRES_USER'),
-#         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-#         'NAME': os.environ.get('POSTGRES_DATABASE')
-#
-#     }
-# }
-
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+
+        'HOST': os.environ.get('POSTGRES_HOST'),
+        'PORT': '5432',
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'NAME': os.environ.get('POSTGRES_DB')
+
     }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

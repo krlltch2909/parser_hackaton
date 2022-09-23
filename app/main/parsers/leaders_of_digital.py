@@ -1,7 +1,7 @@
 import requests 
 from datetime import datetime
 from main.models import *
-from utils import get_event_status_based_on_date
+from .utils import get_event_status_based_on_date
 
 
 def get_leaders_of_digital_events():
