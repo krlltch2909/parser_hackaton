@@ -2,6 +2,8 @@ __pycache__/
 app/postgres/data/
 app/postgres/db/
 
+app/db.server
+
 
 app/.env
 
