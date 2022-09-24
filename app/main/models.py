@@ -23,13 +23,13 @@ class StatusOfEvent(models.Model):
 
 
 class Event(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=255)
     description = models.TextField()
 
-    address = models.CharField(max_length=255, blank=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
 
-    start_date = models.DateTimeField(blank=True)
-    end_date = models.DateTimeField(blank=True)
+    start_date = models.DateTimeField(blank=True,  null=True)
+    end_date = models.DateTimeField(blank=True,  null=True)
 
     url = models.URLField(max_length=255)
     img = models.URLField(max_length=255)

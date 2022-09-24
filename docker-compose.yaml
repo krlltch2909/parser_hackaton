@@ -48,7 +48,7 @@ services:
     command: >
       sh -c "celery -A app worker -l INFO"
     depends_on:
-      - server
+      - postgres
 
 # worker для назначения переодических задач
   celery_beats:
@@ -62,7 +62,7 @@ services:
       sh -c " celery -A app beat -l INFO
       --scheduler django_celery_beat.schedulers:DatabaseScheduler"
     depends_on:
-      - server
+      - postgres
 
 volumes:
   postgres:
