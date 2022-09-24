@@ -8,7 +8,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if len(EventTypeClissifier.objects.all()) == 0:
             EventTypeClissifier.objects.create(type_code=1, description='conference')
-            EventTypeClissifier.objects.create(type_code=2, description='hackaton')
+            EventTypeClissifier.objects.create(type_code=2, description='hackathon')
             EventTypeClissifier.objects.create(type_code=3, description='CTF')
             EventTypeClissifier.objects.create(type_code=4, description='olimpiada')
             EventTypeClissifier.objects.create(type_code=5, description='scientific publication')

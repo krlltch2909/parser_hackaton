@@ -1,43 +1,37 @@
 import requests
 from datetime import datetime
 from main.models import *
-from .utils import get_event_status_based_on_date
+
+
+HACKATHONS = "hackathons"
+CHAMPIOMSHIPS = "championships"
 
 
 def get_hacks_ai_events():
-    headers = {
-        'Content-Type': 'application/json'
-    }
-    response = requests.get("https://hacks-ai.ru/api/v2/hackathons/cards", headers=headers)
+    response = requests.get("https://hacks-ai.ru/api/v2/hackathons/cards")
     data = response.json()
+    raw_events = _add_type(data["district"], HACKATHONS)
+    raw_events.extend(_add_type(data["region"], CHAMPIOMSHIPS))
+    raw_events.extend(_add_type(data["federal"], CHAMPIOMSHIPS))
     events = []
-    raw_events = _add_type(data["district"], "hackathons")
-    raw_events.extend(_add_type(data["region"], "championships"))
-    raw_events.extend(_add_type(data["federal"], "championships"))
 
     for raw_event in raw_events:
         event = Event()
-        _fill_event(event, int(raw_event["id"]), raw_event["type"], raw_event["status"])
-        events.append(event)
+        fill_status = _fill_event(event, int(raw_event["id"]), raw_event["type"])
+        if fill_status:
+            events.append(event)
 
-    result_events = []
-
-    for event in events:
-        if event.status_of_event != StatusOfEvent.objects.get(status_code=2) \
-            and event.status_of_event != StatusOfEvent.objects.get(status_code=3):
-            result_events.append(event)
-
-    return result_events
+    return events
 
 
 def _get_tasks(event_id, event_type):
-    task_type = "cases" if event_type == "hackathons" else "tasks"
+    task_type = "cases" if event_type == HACKATHONS else "tasks"
     response = requests.get(f"https://hacks-ai.ru/api/v2/{event_type}/{event_id}/{task_type}")
     raw_tasks = response.json()
     tasks = []
 
     for raw_task in raw_tasks:
-        tasks.append(raw_task["name"] if event_type == "hackathons" else raw_task["title"])
+        tasks.append(raw_task["name"] if event_type == HACKATHONS else raw_task["title"])
     
     return tasks
 
@@ -47,11 +41,19 @@ def _get_event_info(event_id, event_type):
     return response.json()
 
 
-def _fill_event(event, event_id, event_type, event_status):
+def _fill_event(event, event_id, event_type):
     event_info = _get_event_info(event_id, event_type)
+
+    if "registrationDeadline" not in event_info.keys():
+        return False
+
     event.address = event_info["address"]
-    event.start_date = datetime.fromisoformat(event_info["startDate"]).replace(tzinfo=None)
-    event.end_date = datetime.fromisoformat(event_info["endDate"]).replace(tzinfo=None)
+    event.registration_deadline = datetime.fromisoformat(event_info["registrationDeadline"]) \
+        .replace(tzinfo=None)
+
+    if event.registration_deadline < datetime.now():
+        return False
+
     description = ""
     tasks = _get_tasks(event_id, event_type)
 
@@ -63,20 +65,26 @@ def _fill_event(event, event_id, event_type, event_status):
         event.img = event_info["img"]
     event.url = f"https://hacks-ai.ru/{event_type}/{event_id}"
 
-    if event_type == "hackatons":
+    if not _check_availability(event.url):
+        return False
+
+    if event_type == HACKATHONS:
         event.title = "Хакатон"
-        event.type_of_event = EventTypeClissifier.objects.get(type_code=2) # hackaton
+        event.type_of_event = EventTypeClissifier.objects.get(type_code=2) # hackathon
     else:
         event.title = "Чемпионат"
         event.type_of_event = EventTypeClissifier.objects.get(type_code=6) # championship    
-    
-    if event_status == "registration":
-        event.status_of_event = StatusOfEvent.objects.get(status_code=4) # registration
-    else:
-        event.status_of_event = get_event_status_based_on_date(event)
+
+    event.status_of_event = StatusOfEvent.objects.get(status_code=4) # registration
+    return True
 
 
 def _add_type(events, type):
     for event in events:
         event["type"] = type
     return events
+
+
+def _check_availability(event_url):
+    response = requests.get(event_url)
+    return response.status_code != 404
