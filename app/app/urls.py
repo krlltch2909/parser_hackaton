@@ -15,12 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
-from main.views import test, TitleAPIView
+from main.views import test, TypeTitleAPIView
 
 urlpatterns = [
     path('test/', test),
     path('admin/', admin.site.urls),
-    path('api/hackaton/', TitleAPIView.as_view()),
+    path('api/hackaton/', TypeTitleAPIView.as_view()),
     path('api/auth/', include('djoser.urls')),                  # подключение джосера для регистрации, авторизации, получения токена
     re_path('api/auth/', include('djoser.urls.authtoken')),     # 
 ]                                                               # все url(пути): https://djoser.readthedocs.io/en/latest/base_endpoints.html
