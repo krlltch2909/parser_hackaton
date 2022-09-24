@@ -20,7 +20,14 @@ def get_hacks_ai_events():
         _fill_event(event, int(raw_event["id"]), raw_event["type"], raw_event["status"])
         events.append(event)
 
-    return events
+    result_events = []
+
+    for event in events:
+        if event.status_of_event != StatusOfEvent.objects.get(status_code=2) \
+            and event.status_of_event != StatusOfEvent.objects.get(status_code=3):
+            result_events.append(event)
+
+    return result_events
 
 
 def _get_tasks(event_id, event_type):
