@@ -1,4 +1,3 @@
-from django.shortcuts import HttpResponse
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import Event
@@ -20,7 +19,3 @@ class TypeTitleAPIView(generics.ListAPIView):
             queryset = queryset.filter(type_of_event=type_of_event_get)
         return queryset
 
-
-def test(request):
-    # add_status_type_to_bd()
-    return HttpResponse('<h1>sending</h1>')
