@@ -2,6 +2,7 @@ from celery import shared_task
 from .parsers.leaders_of_digital import get_leaders_of_digital_events
 from .parsers.hacks_ai import get_hacks_ai_events
 from .parsers.all_events import get_all_events
+from .parsers.hackathon_com import get_hackathon_com_events
 from .models import Event
 
 
@@ -23,7 +24,8 @@ def parse_new_events() -> None:
     rez1 = get_hacks_ai_events()
     rez2 = get_leaders_of_digital_events()
     rez3 = get_all_events()
-    return_rez = rez1 + rez2 + rez3
+    rez4 = get_hackathon_com_events()
+    return_rez = rez1 + rez2 + rez3 + rez4
 
     saved_events = Event.objects.all()
 
