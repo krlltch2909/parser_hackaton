@@ -6,7 +6,6 @@ from main.models import *
 
 
 def get_all_events():
-    # User-Agent нужно убрать в переменную среды
     headers = {
         "User-Agent": os.environ.get("USER_AGENT")
     }
@@ -39,11 +38,13 @@ def get_all_events():
             raw_start_date = raw_event.find(name="div", 
                                             attrs={"itemprop": "startDate"}) \
                                       .get("content")
-            event.start_date = datetime.fromisoformat(raw_start_date)
+            event.start_date = datetime.fromisoformat(raw_start_date) \
+                .replace(tzinfo=None)
             raw_end_date = raw_event.find(name="div", 
                                           attrs={"itemprop": "endDate"}) \
                                     .get("content")
-            event.end_date = datetime.fromisoformat(raw_end_date)
+            event.end_date = datetime.fromisoformat(raw_end_date) \
+                .replace(tzinfo=None)
             event.url = "https://all-events.ru" \
                 + raw_event.find(name="a", attrs={"itemprop": "url"}) \
                            .get("href")
@@ -52,8 +53,8 @@ def get_all_events():
             event.address = raw_event.find(name="div", class_="event-venue") \
                                      .find(name="div", class_="address") \
                                      .string
-            event.type_of_event = EventTypeClissifier.objects.get(type_code=1) 
-            event.status_of_event = StatusOfEvent.objects.get(status_code=4)
+            event.type_of_event = EventTypeClissifier.objects.get(type_code=1)  # conference 
+            event.status_of_event = StatusOfEvent.objects.get(status_code=3)  # unavailable
             events.append(event)
     
     return events

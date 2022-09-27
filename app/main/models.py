@@ -29,6 +29,7 @@ class Event(models.Model):
     address = models.CharField(max_length=255, blank=True, null=True)
 
     start_date = models.DateTimeField(blank=True,  null=True)
+    registration_deadline = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True,  null=True)
 
     url = models.URLField(max_length=255)
