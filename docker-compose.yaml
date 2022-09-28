@@ -17,8 +17,7 @@ services:
           PGDATA: /var/lib/postgresql/data/db/
       volumes:
         - ./app/postgres:/var/lib/postgresql/data/
-#      volumes:
-#        - ./app/postgres/data/:/var/lib/postgresql/data/
+
 
 # основной сервер
   server:
@@ -28,12 +27,16 @@ services:
       context: app/
     env_file:
       - ./app/.env
-    ports:
-      - "8000:8000"
+#    ports:
+#      - "8000:8000"
+    expose:
+      - 8000
     command: > 
       sh runscript.sh
     depends_on:
       - postgres
+    volumes:
+      - static_data:/server/staticfiles
 
 # worker для асинхронной работы и исполнения переодических задач
   worker:
@@ -62,5 +65,20 @@ services:
     depends_on:
       - server
 
+# веб-сервис nginx
+  nginx:
+    restart: always
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./nginx_conf/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx_conf/logs/:/etc/nginx/logs/
+      - static_data:/server/staticfiles
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+
 volumes:
   postgres:
+  static_data:

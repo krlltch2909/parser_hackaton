@@ -13,6 +13,8 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include, re_path
 from main.views import TypeTitleAPIView
@@ -20,6 +22,13 @@ from main.views import TypeTitleAPIView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/hackaton/', TypeTitleAPIView.as_view()),
-    path('api/auth/', include('djoser.urls')),                  # подключение джосера для регистрации, авторизации, получения токена
-    re_path('api/auth/', include('djoser.urls.authtoken')),     # 
-]                                                               # все url(пути): https://djoser.readthedocs.io/en/latest/base_endpoints.html
+    path('api/auth/', include('djoser.urls')),
+    re_path('api/auth/', include('djoser.urls.authtoken')),
+
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+
+"""
+    подключение джосера для регистрации, авторизации, получения токена
+    все url(пути): https://djoser.readthedocs.io/en/latest/base_endpoints.html
+"""

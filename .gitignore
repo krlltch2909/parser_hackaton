@@ -6,7 +6,7 @@ app/db.server
 
 
 app/.env
-
+nginx_conf/logs/
 */__pycache__/
 **/__pycache__/
 

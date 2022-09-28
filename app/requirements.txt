@@ -60,3 +60,6 @@ vine==5.0.0
 wcwidth==0.2.5
 wheel==0.37.1
 wrapt==1.14.1
+gunicorn==20.1.0
+whitenoise==6.2.0
+
