@@ -13,15 +13,6 @@ class EventTypeClissifier(models.Model):
         return self.description
 
 
-# классификатор статуса события
-class StatusOfEvent(models.Model):
-    status_code = models.SmallIntegerField(primary_key=True)
-    description = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.description
-
-
 class Event(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
@@ -36,7 +27,6 @@ class Event(models.Model):
     img = models.URLField(max_length=255)
 
     type_of_event = models.ForeignKey(EventTypeClissifier, on_delete=models.DO_NOTHING)
-    status_of_event = models.ForeignKey(StatusOfEvent, on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.title

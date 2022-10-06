@@ -1,11 +1,9 @@
-from datetime import datetime
+import re
 from main.models import *
 
 
-def get_event_status_based_on_date(event):
-    if event.start_date > datetime.now() and event.end_date < datetime.now():
-        return StatusOfEvent.objects.get(status_code=1) # in process
-    elif event.start_date > datetime.now():
-        return StatusOfEvent.objects.get(status_code=3) # unavailable
-    else:
-        return StatusOfEvent.objects.get(status_code=2) # ended
+CLEANER = re.compile('<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
+
+event_types = {}
+for event_type in EventTypeClissifier.objects.all():
+    event_type[event_type.description] = event_type.type_code
