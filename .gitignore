@@ -13,6 +13,7 @@ nginx_conf/logs/
 .DS_Store
 
 
+app/db.sqlite3
 .idea/
 app/.env/
 app/.venv/

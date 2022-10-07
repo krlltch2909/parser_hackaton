@@ -27,17 +27,16 @@ services:
       context: app/
     env_file:
       - ./app/.env
-#    ports:
-#      - "8000:8000"
-    expose:
-      - 8000
+#    expose:
+#      - 8000
+    ports:
+      - "8000:8000"
     command: > 
       sh runscript.sh
     depends_on:
       - postgres
     volumes:
-      - static_data:/server/staticfiles
-
+      - ./app:/server
 # worker для асинхронной работы и исполнения переодических задач
   worker:
     container_name: celery_worker
@@ -73,7 +72,7 @@ services:
     volumes:
       - ./nginx_conf/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx_conf/logs/:/etc/nginx/logs/
-      - static_data:/server/staticfiles
+      - ./app:/server
     ports:
       - "80:80"
     depends_on:
@@ -81,4 +80,3 @@ services:
 
 volumes:
   postgres:
-  static_data:

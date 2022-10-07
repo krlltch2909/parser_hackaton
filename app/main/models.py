@@ -29,4 +29,4 @@ class Event(models.Model):
     type_of_event = models.ForeignKey(EventTypeClissifier, on_delete=models.DO_NOTHING)
 
     def __str__(self):
-        return self.title
+        return self.title + " " + self.url
