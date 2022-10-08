@@ -81,7 +81,7 @@ def get_all_events() -> list:
             raw_event_type = event_additional_data.find("div", class_="event-type").string
 
             # Если данного типа мерроприятия нет в списке, то пропускаем его
-            if raw_event_type not in event_types.keys:
+            if raw_event_type not in event_types.keys():
                 continue
             
             event.type_of_event = EventTypeClissifier \

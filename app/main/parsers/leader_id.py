@@ -49,7 +49,7 @@ def get_leader_id_events() -> list:
         event_raw_type = raw_event["type"]["name"]
         
         # Если данного типа мерроприятия нет в списке, то пропускаем его
-        if event_raw_type not in event_types.keys:
+        if event_raw_type not in event_types.keys():
             continue
 
         event.title = raw_event["full_name"]

@@ -36,7 +36,7 @@ def get_ict2go_events() -> list:
         event_raw_type = raw_event.find("a", class_="event-type").string
 
         # Если данного типа мерроприятия нет в списке, то пропускаем его
-        if event_raw_type not in event_types.keys:
+        if event_raw_type not in event_types.keys():
             continue
 
         event.type_of_event = EventTypeClissifier \
