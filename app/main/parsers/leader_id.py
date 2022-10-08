@@ -69,11 +69,6 @@ def get_leader_id_events() -> list:
             "%Y-%m-%d %H:%M:%S"
         )
         event.start_date = event.start_date.replace(tzinfo=local_tz)
-        event.registration_deadline = datetime.strptime(
-            raw_event["registration_date_end"], 
-            "%Y-%m-%d %H:%M:%S"
-        )
-        event.registration_deadline = event.registration_deadline.replace(tzinfo=local_tz)
         event.end_date = datetime.strptime(
             raw_event["date_end"], 
             "%Y-%m-%d %H:%M:%S"
@@ -83,16 +78,14 @@ def get_leader_id_events() -> list:
         # Переводим в московское время
         moscow_tz = timezone(timedelta(hours=3))
         event.start_date = event.start_date.astimezone(moscow_tz)
-        event.registration_deadline = event.registration_deadline.astimezone(moscow_tz)
         event.end_date = event.end_date.astimezone(moscow_tz)
-
-        # Проверка на актуальность
-        if event.registration_deadline < datetime.now(tzlocal()).astimezone(moscow_tz):
-            continue
 
         event.url = f"https://leader-id.ru/events/{raw_event['id']}"
         event.img = raw_event["photo"]
-        event.address = f"{raw_event['city']}, {raw_event['space_name']}"
+
+        if raw_event["format"] != "online":
+            if raw_event["space"] is not None:
+                event.address = raw_event["space"]["address"]["title"]
 
         event.type_of_event = EventTypeClissifier \
                 .objects.get(type_code=event_types[event_raw_type])
