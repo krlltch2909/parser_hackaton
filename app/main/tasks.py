@@ -3,10 +3,13 @@ from celery import shared_task
 from dateutil.relativedelta import relativedelta
 
 from .models import Event
-from .parsers.leaders_of_digital import get_leaders_of_digital_events
-from .parsers.hacks_ai import get_hacks_ai_events
+
 from .parsers.all_events import get_all_events
 from .parsers.hackathon_com import get_hackathon_com_events
+from .parsers.hacks_ai import get_hacks_ai_events
+from .parsers.ict2go_events import get_ict2go_events
+from .parsers.leader_id import get_leader_id_events
+from .parsers.leaders_of_digital import get_leaders_of_digital_events
 
 
 @shared_task
@@ -32,10 +35,13 @@ def parse_new_events() -> None:
     method for parsing and filtering sites
     :return: None
     """
-    all_threads = [get_hacks_ai_events,
-                   get_leaders_of_digital_events,
-                   get_all_events,
-                   get_hackathon_com_events]
+    all_threads = [get_all_events,
+                   get_hackathon_com_events,
+                   get_hacks_ai_events,
+                   get_ict2go_events,
+                   get_leader_id_events,
+                   get_leaders_of_digital_events
+                   ]
 
     time_start = datetime.now()
     return_rez = []

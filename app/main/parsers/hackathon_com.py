@@ -4,7 +4,7 @@ import requests
 from dateutil.tz import tzlocal
 from datetime import datetime, timedelta, timezone, timedelta
 from main.models import *
-from utils import CLEANER
+from .utils import CLEANER
 
 
 def get_hackathon_com_events() -> list:

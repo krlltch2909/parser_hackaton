@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
-from app.main.models import EventCostClassifier
-from main.models import EventTypeClissifier, StatusOfEvent
+from main.models import EventCostClassifier
+from main.models import EventTypeClissifier
 
 
 class Command(BaseCommand):

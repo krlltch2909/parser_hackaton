@@ -17,4 +17,6 @@ venv/
 .DS_Store/
 .env
 
+db.server
+
 postgres/

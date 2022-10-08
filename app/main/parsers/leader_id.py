@@ -4,7 +4,7 @@ import requests
 from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
 from main.models import *
-from utils import event_types, CLEANER
+from .utils import event_types, CLEANER
 
 
 _themeIds = [ 

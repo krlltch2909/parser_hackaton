@@ -4,7 +4,7 @@ from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
 from bs4 import BeautifulSoup
 from main.models import *
-from utils import event_types
+from .utils import event_types
 
 
 def get_ict2go_events() -> list:

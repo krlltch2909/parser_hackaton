@@ -20,7 +20,7 @@ services:
 
 
 # основной сервер
-  server:
+  django:
     container_name: server
     restart: always
     build:
@@ -48,7 +48,7 @@ services:
     command: >
       sh -c "celery -A app worker -l INFO"
     depends_on:
-      - server
+      - django
 
 # worker для назначения переодических задач
   celery_beats:
@@ -62,7 +62,7 @@ services:
       sh -c " celery -A app beat -l INFO
       --scheduler django_celery_beat.schedulers:DatabaseScheduler"
     depends_on:
-      - server
+      - django
 
 # веб-сервис nginx
   nginx:
@@ -76,7 +76,7 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - server
+      - django
 
 volumes:
   postgres:
