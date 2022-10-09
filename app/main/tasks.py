@@ -71,6 +71,6 @@ def parse_new_events() -> None:
                 event.save()
             # else:
             #     print("already exists")
-        except:
-            print("error in saving")
+        except Exception as e:
+            print("error in saving " + e)
     print('ended')

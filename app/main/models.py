@@ -37,7 +37,7 @@ class Event(models.Model):
     type_of_event = models.ForeignKey(EventTypeClissifier, on_delete=models.DO_NOTHING)
     is_free = models.BooleanField(blank=True, null=True)
 
-    tag = models.ManyToManyField(Tags, blank=True, null=True)
+    tag = models.ManyToManyField(Tags, blank=True)
 
     def __str__(self):
         return self.title
