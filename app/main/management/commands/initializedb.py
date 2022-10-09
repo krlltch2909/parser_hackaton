@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
-from main.models import EventCostClassifier
-from main.models import EventTypeClissifier
+from main.models import EventCostClassifier, EventTypeClissifier, Tags
+
 
 
 class Command(BaseCommand):
@@ -18,3 +18,7 @@ class Command(BaseCommand):
             EventCostClassifier.objects.create(cost_code=1, description='Бесплатно')
             EventCostClassifier.objects.create(cost_code=2, description='Платно')
             EventCostClassifier.objects.create(cost_code=3, description='Неизвестно')
+
+        if len(Tags.objects.all()) == 0:
+            Tags.objects.create(tage_code=1, description="Big Data")
+            Tags.objects.create(tage_code=2, description="Информационная безопвсность")

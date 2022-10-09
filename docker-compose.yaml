@@ -21,7 +21,7 @@ services:
 
 # основной сервер
   django:
-    container_name: server
+    container_name: django
     restart: always
     build:
       context: app/

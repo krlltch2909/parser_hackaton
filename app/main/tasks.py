@@ -1,9 +1,9 @@
+import time
 from datetime import datetime
 from celery import shared_task
 from dateutil.relativedelta import relativedelta
 
 from .models import Event
-
 from .parsers.all_events import get_all_events
 from .parsers.hackathon_com import get_hackathon_com_events
 from .parsers.hacks_ai import get_hacks_ai_events
@@ -45,13 +45,18 @@ def parse_new_events() -> None:
 
     time_start = datetime.now()
     return_rez = []
-    for tasks in all_threads:
+    for task in all_threads:
         try:
-            rez = tasks()
+            rez = task()
             print(len(rez))
             return_rez += rez
+        except KeyError:
+            print("Key error")
         except RuntimeError:
-            print("error")
+            print("Runtime error")
+        except Exception as e:
+            print("error " + e)
+
     time_end = datetime.now() - time_start
     print(time_end)
     print(len(return_rez))
@@ -59,10 +64,13 @@ def parse_new_events() -> None:
     saved_events = Event.objects.all()
 
     for event in return_rez:
-        find_same_event = saved_events.filter(title=event.title, start_date=event.start_date)
-        print(find_same_event)
-        if len(find_same_event) == 0:
-            event.save()
-        else:
-            print("already exists")
+        try:
+            find_same_event = saved_events.filter(title=event.title, start_date=event.start_date)
+
+            if len(find_same_event) == 0:
+                event.save()
+            # else:
+            #     print("already exists")
+        except:
+            print("error in saving")
     print('ended')
