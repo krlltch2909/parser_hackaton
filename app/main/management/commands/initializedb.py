@@ -13,11 +13,6 @@ class Command(BaseCommand):
             EventTypeClissifier.objects.create(type_code=3, description='Соревнование')
             EventTypeClissifier.objects.create(type_code=4, description='Акселератор')
             EventTypeClissifier.objects.create(type_code=5, description='Конкурс')
-        
-        if len(EventCostClassifier.objects.all()) == 0:
-            EventCostClassifier.objects.create(cost_code=1, description='Бесплатно')
-            EventCostClassifier.objects.create(cost_code=2, description='Платно')
-            EventCostClassifier.objects.create(cost_code=3, description='Неизвестно')
 
         if len(Tags.objects.all()) == 0:
             Tags.objects.create(tage_code=1, description="Big Data")

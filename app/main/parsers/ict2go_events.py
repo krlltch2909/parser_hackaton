@@ -1,8 +1,8 @@
-import requests
 import html
+import requests
+from bs4 import BeautifulSoup
 from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
-from bs4 import BeautifulSoup
 from main.models import *
 from .utils import event_types
 
@@ -48,6 +48,7 @@ def get_ict2go_events() -> list:
         event.url = event_additional_info["url"]
         event.start_date = event_additional_info["start_date"]
         event.end_date = event_additional_info["end_date"]
+        event.is_free = event_additional_info["is_free"]
 
         # Устанавливаем московский часовой пояс
         moscow_tz = timezone(timedelta(hours=3))
@@ -93,6 +94,13 @@ def _get_event_additional_info(event_url: str) -> dict:
 
     raw_date_info = raw_date_info[:raw_date_info.index(". Начало")]
     raw_dates = raw_date_info.split(" - ")
+
+    # Проверка стоимости мероприятия. Если не платное, 
+    # то может быть как бесплатное, так и платное
+    if soup.find("p", class_="price-info") is not None:
+        result["is_free"] = False
+    else:
+        result["is_free"] = None
 
     if len(raw_dates) == 2:
         result["start_date"] = datetime.strptime(raw_dates[0], "%d.%m.%Y")

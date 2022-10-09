@@ -1,20 +1,16 @@
 import json
 import re
 import requests
-from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
 from main.models import *
 from .utils import event_types, CLEANER
 
 
-_themeIds = [ 
-    603, 599, 610, 608, 602, 606, 609, 
-    605, 600, 612, 604, 1227, 601, 613, 
-    611, 607, 751, 755, 753, 16, 
-    750, 698, 37, 746, 745, 36, 742, 749, 
-    11, 50, 2, 46, 748, 4
+_themeIds = [
+    603, 599, 608, 610, 602, 606, 609, 605, 612,
+    600, 604, 1227, 601, 613, 607, 611, 749,
+    742, 36, 745, 37, 698, 753, 751
 ]
-
 
 def get_leader_id_events() -> list:
     """

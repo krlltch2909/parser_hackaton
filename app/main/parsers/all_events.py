@@ -1,9 +1,9 @@
+import html
 import os
 import requests
-import html
+from bs4 import BeautifulSoup
 from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
-from bs4 import BeautifulSoup
 from main.models import *
 from .utils import event_types
 
@@ -16,7 +16,7 @@ def get_all_events() -> list:
     headers = {
         "User-Agent": os.environ.get("USER_AGENT")
     }
-    url = "https://all-events.ru/events/calendar/theme-is-upravlenie_personalom_hr-or-informatsionnye_tekhnologii-or-automotive_industry-or-bezopasnost-or-blokcheyn_kriptovalyuty-or-innovatsii-or-it_telecommunications-or-oil_gas-or-transport-or-elektronnaya_kommertsiya-or-energetics/type-is-webinar-or-conferencia-or-hackathon-or-contest/"
+    url = "https://all-events.ru/events/calendar/theme-is-upravlenie_personalom_hr-or-informatsionnye_tekhnologii-or-automotive_industry-or-bezopasnost-or-blokcheyn_kriptovalyuty-or-innovatsii-or-it_telecommunications-or-or-elektronnaya_kommertsiya/type-is-conferencia-or-hackathon-or-contest/"
     response = requests.get(url, headers=headers)
     html_decoded_string = html.unescape(response.text)
     first_page = BeautifulSoup(html_decoded_string, "html.parser")
@@ -31,6 +31,8 @@ def get_all_events() -> list:
         raw_pages.append(raw_page)
 
     events = []
+
+    # Для каждой html страницы получаем свои события
     for raw_page in raw_pages:
         raw_events_list_element = raw_page \
             .find(name="div", class_="events-list")
@@ -86,6 +88,17 @@ def get_all_events() -> list:
             
             event.type_of_event = EventTypeClissifier \
                 .objects.get(type_code=event_types[raw_event_type])
+
+            
+            raw_event_cost_type = raw_event.find("div", class_="event-price") \
+                                           .get("content") \
+                                           .strip(" ")
+
+            if raw_event_cost_type == "Бесплатно":
+                event.is_free = True
+            elif raw_event_cost_type.replace(" ", "").isdigit():
+                event.is_free = False
+    
             events.append(event)
     
     return events

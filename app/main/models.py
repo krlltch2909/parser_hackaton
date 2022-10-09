@@ -13,14 +13,6 @@ class EventTypeClissifier(models.Model):
         return self.description
 
 
-class EventCostClassifier(models.Model):
-    cost_code = models.SmallIntegerField(primary_key=True)
-    description = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.description
-
-
 class Tags(models.Model):
     tage_code = models.SmallIntegerField(primary_key=True)
     description = models.CharField(max_length=255)
@@ -43,7 +35,7 @@ class Event(models.Model):
     img = models.URLField(max_length=255, null=True)
 
     type_of_event = models.ForeignKey(EventTypeClissifier, on_delete=models.DO_NOTHING)
-    event_cost_type = models.ForeignKey(EventCostClassifier, on_delete=models.DO_NOTHING, null=True, blank=True)
+    is_free = models.BooleanField(blank=True, null=True)
 
     tag = models.ManyToManyField(Tags, blank=True, null=True)
 
