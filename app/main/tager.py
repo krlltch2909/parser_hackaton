@@ -1,6 +1,6 @@
 from datetime import datetime
 from fonetika.soundex import RussianSoundex
-from main.models import Event
+from main.models import Event, Tag
 from app.settings import BASE_DIR
 
 import json
@@ -29,7 +29,7 @@ def update_all():
     event_dict = {}
 
     for event in events:
-        if event.tag is None:
+        if len(event.tags.all()) == 0:
             text = event.description + " " + event.title
             text = text.split(' ')
             event_tags = {}
@@ -46,6 +46,8 @@ def update_all():
 
             for i in event_tags:
                 if event_tags.get(i) >= 5:
+                    tag_for_event = Tag.objects.filter(description=i)
+                    event.tags.add(tag_for_event[0])
                     rez_events.append(event)
                     event_dict[event.title] = i
 

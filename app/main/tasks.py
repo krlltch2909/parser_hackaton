@@ -10,6 +10,8 @@ from .parsers.hacks_ai import get_hacks_ai_events
 from .parsers.ict2go_events import get_ict2go_events
 from .parsers.leader_id import get_leader_id_events
 from .parsers.leaders_of_digital import get_leaders_of_digital_events
+from .parsers.na_conferencii import get_na_conferencii_events
+from .parsers.university_2035 import get_2035_university_events
 
 
 @shared_task
@@ -40,7 +42,9 @@ def parse_new_events() -> None:
                    get_hacks_ai_events,
                    get_ict2go_events,
                    get_leader_id_events,
-                   get_leaders_of_digital_events
+                   get_leaders_of_digital_events,
+                   get_na_conferencii_events,
+                   get_2035_university_events
                    ]
 
     time_start = datetime.now()
