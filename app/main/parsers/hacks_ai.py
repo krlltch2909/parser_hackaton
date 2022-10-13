@@ -87,7 +87,7 @@ def _fill_event(event, event_id, event_type) -> bool:
 
         event.type_of_event = EventTypeClissifier.objects.get(type_code=3) # Соревнование
 
-    event.is_free = True
+    # event.is_free = True
     return True
 
 

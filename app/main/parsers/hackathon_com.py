@@ -37,7 +37,7 @@ def get_hackathon_com_events() -> list:
         event.img = raw_event["image"]
 
         event.type_of_event = EventTypeClissifier.objects.get(type_code=2)  # Хакатон
-        event.is_free = True
+        # event.is_free = True
         events.append(event)
     
     return events

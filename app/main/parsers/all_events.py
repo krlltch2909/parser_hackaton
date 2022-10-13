@@ -16,7 +16,7 @@ def get_all_events() -> list:
     headers = {
         "User-Agent": os.environ.get("USER_AGENT")
     }
-    url = "https://all-events.ru/events/calendar/theme-is-upravlenie_personalom_hr-or-informatsionnye_tekhnologii-or-automotive_industry-or-bezopasnost-or-blokcheyn_kriptovalyuty-or-innovatsii-or-it_telecommunications-or-or-elektronnaya_kommertsiya/type-is-conferencia-or-hackathon-or-contest/"
+    url = "https://all-events.ru/events/calendar/theme-is-upravlenie_personalom_hr-or-informatsionnye_tekhnologii-or-automotive_industry-or-bezopasnost-or-blokcheyn_kriptovalyuty-or-innovatsii-or-it_telecommunications-or-elektronnaya_kommertsiya/type-is-conferencia-or-hackathon-or-contest/"
     response = requests.get(url, headers=headers)
     html_decoded_string = html.unescape(response.text)
     first_page = BeautifulSoup(html_decoded_string, "html.parser")
@@ -90,14 +90,14 @@ def get_all_events() -> list:
                 .objects.get(type_code=event_types[raw_event_type])
 
             
-            raw_event_cost_type = raw_event.find("div", class_="event-price") \
-                                           .get("content") \
-                                           .strip(" ")
+            # raw_event_cost_type = raw_event.find("div", class_="event-price") \
+            #                                .get("content") \
+            #                                .strip(" ")
 
-            if raw_event_cost_type == "Бесплатно":
-                event.is_free = True
-            elif raw_event_cost_type.replace(" ", "").isdigit():
-                event.is_free = False
+            # if raw_event_cost_type == "Бесплатно":
+            #     event.is_free = True
+            # elif raw_event_cost_type.replace(" ", "").isdigit():
+            #     event.is_free = False
     
             events.append(event)
     
