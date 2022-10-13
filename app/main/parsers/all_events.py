@@ -1,11 +1,12 @@
 import html
 import os
+import re
 import requests
 from bs4 import BeautifulSoup
 from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
 from main.models import *
-from .utils import event_types
+from .utils import event_types, CLEANER
 
 
 def get_all_events() -> list:
@@ -48,10 +49,18 @@ def get_all_events() -> list:
             event.title = raw_event \
                 .find(name="div", class_="event-title") \
                 .string
-            event.description = raw_event \
-                .find(name="span", attrs={"itemprop": "description"}) \
-                .string
-            event.description = event.description.strip()
+            description_items = raw_event \
+                .find(name="span", attrs={"itemprop": "description"}).contents
+            
+            description = ""
+            for description_item in description_items:
+                description += re.sub(CLEANER, "", str(description_item).strip(" \n\t\r"))
+
+            event.description = description
+            event.description = event.description.replace("\n\n","")
+            event.description = event.description.replace("\t", "")
+            event.description = event.description.replace("\r", "")
+
             raw_start_date = raw_event.find(name="div", 
                                             attrs={"itemprop": "startDate"}) \
                                       .get("content")
