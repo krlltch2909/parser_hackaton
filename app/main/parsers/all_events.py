@@ -98,15 +98,17 @@ def get_all_events() -> list:
             event.type_of_event = EventTypeClissifier \
                 .objects.get(type_code=event_types[raw_event_type])
 
-            
-            # raw_event_cost_type = raw_event.find("div", class_="event-price") \
-            #                                .get("content") \
-            #                                .strip(" ")
+            # Вычисление стоимости мероприятия
+            raw_event_cost_type = raw_event.find("div", class_="event-price") \
+                                           .get("content") \
+                                           .strip(" ")
+            print(raw_event_cost_type)
 
-            # if raw_event_cost_type == "Бесплатно":
-            #     event.is_free = True
-            # elif raw_event_cost_type.replace(" ", "").isdigit():
-            #     event.is_free = False
+            if raw_event_cost_type == "Бесплатно":
+                event.is_free = True
+            elif raw_event_cost_type != "" \
+                and raw_event_cost_type[len(raw_event_cost_type)-1].isdigit():
+                event.is_free = False
     
             events.append(event)
     

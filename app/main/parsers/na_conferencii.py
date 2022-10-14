@@ -1,5 +1,6 @@
 import html
 import locale
+import re
 import requests
 from bs4 import BeautifulSoup
 from dateutil.tz import tzlocal
@@ -21,34 +22,48 @@ ref_categories = {
     "Web of Science": 7,
 }
 
+# Ключевые слова для выявления стоимости мероприятия
+keywords = {
+    "paid": {
+        "words": ["руб.", "рублей", ],
+        "regex": ["\d р.", ]
+    },
+    "free": {
+        "words": ["бесплатн", ],
+        "regex": [".*взнос.*не предусм.*"]
+    }
+}
+
 
 def get_na_conferencii_events() -> list:
     """
     Возвращает конференции с сайта: 
     https://na-konferencii.ru/
     """
-    url = "https://na-konferencii.ru/wp-admin/admin-ajax.php"
+    # url = "https://na-konferencii.ru/wp-admin/admin-ajax.php"
+    url = "https://na-konferencii.ru/conference-type/konferencii"
 
-    # Строка для более конкретного поиска по сайту
-    base_data_string= f"action=filterhome&nonce={_get_nonce_key()}"
-    for category in categories.values():
-        base_data_string += f"&category%5B%5D={category}"
+    # # Строка для более конкретного поиска по сайту
+    # base_data_string= f"action=filterhome&nonce={_get_nonce_key()}"
+    # for category in categories.values():
+    #     base_data_string += f"&category%5B%5D={category}"
     
-    now = datetime.now()
-    # Необходимо искать концеренции, начало которых не позже текущей даты
-    base_data_string += f"&period_start={now.day}%2F{now.month}%2F{now.year}"
+    # now = datetime.now()
+    # # Необходимо искать концеренции, начало которых не позже текущей даты
+    # base_data_string += f"&period_start={now.day}%2F{now.month}%2F{now.year}"
 
-    for ref_category in ref_categories.values():
-        base_data_string += f"&ref_category%5B%5D={ref_category}"
+    # for ref_category in ref_categories.values():
+    #     base_data_string += f"&ref_category%5B%5D={ref_category}"
 
-    # Ведем поиск только конференций
-    base_data_string += "&search_type=konferencii"
+    # # Ведем поиск только конференций
+    # base_data_string += "&search_type=konferencii"
 
-    headers = {
-        'Content-Type': 'application/x-www-form-urlencoded'
-    }
+    # headers = {
+    #     'Content-Type': 'application/x-www-form-urlencoded'
+    # }
 
-    response = requests.post(url, data=base_data_string + "&page=1", headers=headers)
+    # base_data_string + "&page=1"
+    response = requests.post(url)
     html_decoded_string = html.unescape(response.text)
     page = BeautifulSoup(html_decoded_string, "html.parser")
     pages = [page]
@@ -57,7 +72,8 @@ def get_na_conferencii_events() -> list:
     if len(page_paragraphs) > 1:
         end_page_number = int(page_paragraphs[-2].string)
         for i in range(2, end_page_number+1):
-            response = requests.post(url, data=base_data_string + f"&page={i}", headers=headers)
+            # base_data_string + f"&page={i}"
+            response = requests.post(url + f"/page/{i}")
             html_decoded_string = html.unescape(response.text)
             page = BeautifulSoup(html_decoded_string, "html.parser")
             pages.append(page)
@@ -122,6 +138,8 @@ def get_na_conferencii_events() -> list:
             event.type_of_event = EventTypeClissifier \
                 .objects.get(type_code=event_types["Конференция"])
 
+            event.is_free = event_additional_info["is_free"]
+
             # Проверка на актуальность
             if event.registration_deadline < datetime.now(tzlocal()).astimezone(moscow_tz):
                 continue
@@ -129,23 +147,6 @@ def get_na_conferencii_events() -> list:
             events.append(event)
 
     return events
-
-
-# Ключ, необходимый для выполнения ajax запроса
-def _get_nonce_key() -> str:
-    response = requests.get("https://na-konferencii.ru/")
-    html_decoded_string = html.unescape(response.text)
-    soup = BeautifulSoup(html_decoded_string, "html.parser")
-
-    script = soup.find("script", attrs={"id": "filter-js-extra"})
-    nonce_key_name_index = script.string.index("\"nonce\"")
-    script_content_shortened = script.string[nonce_key_name_index:]
-    raw_nonce_key = script_content_shortened[
-        script_content_shortened.index(":") + 1:
-        script_content_shortened.index("}")
-    ]
-    nonce_key = raw_nonce_key.strip("\"")
-    return nonce_key
 
 
 def _get_event_additional_info(event_url) -> dict:
@@ -185,5 +186,23 @@ def _get_event_additional_info(event_url) -> dict:
     result["description"] = description \
         if len(description) > len(alternative_description) \
         else alternative_description
+
+    # Вычисление стоимости конференции
+    result["is_free"] = None
+    for word in keywords["paid"]["words"]:
+        if word in result["description"].lower():
+            result["is_free"] = False
+    
+    for regex in keywords["paid"]["regex"]:
+        if re.search(regex, result["description"].lower()):
+            result["is_free"] = False
+    
+    for word in keywords["free"]["words"]:
+        if word in result["description"].lower():
+            result["is_free"] = True
+    
+    for regex in keywords["free"]["regex"]:
+        if re.search(regex, result["description"].lower()):
+            result["is_free"] = True
 
     return (is_valid_event, result)

@@ -67,6 +67,8 @@ def get_2035_university_events() -> list:
 
             event.type_of_event = EventTypeClissifier \
                 .objects.get(type_code=event_types["Акселератор"])
+            
+            event.is_free = True
 
             # Проверка на актуальность
             if event.end_date < datetime.now(tzlocal()).astimezone(moscow_tz):
