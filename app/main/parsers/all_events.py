@@ -102,7 +102,7 @@ def get_all_events() -> list:
             raw_event_cost_type = raw_event.find("div", class_="event-price") \
                                            .get("content") \
                                            .strip(" ")
-            print(raw_event_cost_type)
+            # print(raw_event_cost_type)
 
             if raw_event_cost_type == "Бесплатно":
                 event.is_free = True

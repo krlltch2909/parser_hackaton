@@ -52,14 +52,18 @@ def parse_new_events() -> None:
     for task in all_threads:
         try:
             rez = task()
-            print(len(rez))
+            print(task.__str__() + " - " + str(len(rez)))
+
             return_rez += rez
         except KeyError:
             print("Key error")
         except RuntimeError:
             print("Runtime error")
         except Exception as e:
-            print("error " + e)
+            print("error " + str(e))
+            print(e.__str__())
+            print(e.args)
+            print(e.with_traceback())
 
     time_end = datetime.now() - time_start
     print(time_end)
@@ -73,8 +77,10 @@ def parse_new_events() -> None:
 
             if len(find_same_event) == 0:
                 event.save()
-            # else:
-            #     print("already exists")
+            else:
+                for i in find_same_event:
+                    print(f"bd event {i.title} | found new event {event.title}")
+
         except Exception as e:
-            print("error in saving " + e)
+            print("error in saving " + str(e))
     print('ended')

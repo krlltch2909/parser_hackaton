@@ -4,13 +4,14 @@ services:
 # брокер сообщений
   redis:
     container_name: redis
-    restart: always
+#    restart: always
     image: redis
 
 # база данных
   postgres:
       container_name: postgres
       image: postgres
+#      restart: always
       env_file:
         - ./app/.env
       environment:
@@ -22,7 +23,7 @@ services:
 # основной сервер
   django:
     container_name: django
-    restart: always
+#    restart: always
     build:
       context: app/
     env_file:
@@ -40,7 +41,7 @@ services:
 # worker для асинхронной работы и исполнения переодических задач
   worker:
     container_name: celery_worker
-    restart: always
+#    restart: always
     build:
       context: app/
     env_file:
@@ -53,7 +54,7 @@ services:
 # worker для назначения переодических задач
   celery_beats:
     container_name: celery_beats_worker
-    restart: always
+#    restart: always
     build:
       context: app/
     env_file:
@@ -66,7 +67,7 @@ services:
 
 # веб-сервис nginx
   nginx:
-    restart: always
+#    restart: always
     image: nginx:latest
     container_name: nginx
     volumes:

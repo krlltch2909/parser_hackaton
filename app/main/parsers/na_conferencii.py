@@ -108,7 +108,7 @@ def get_na_conferencii_events() -> list:
             registration_month = raw_registration_splitted[2]
             registration_year = raw_registration_splitted[3]
 
-            locale.setlocale(locale.LC_TIME, "ru_RU")
+            locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
             event.start_date = datetime.strptime(f"{start_date_day} {start_date_month} {date_year}", "%d %B %Y")
             event.end_date = datetime.strptime(f"{end_date_day} {end_date_month} {date_year}", "%d %B %Y")
             event.registration_deadline = datetime.strptime(f"{registration_day} {registration_month} {registration_year}", "%d %B %Y")
@@ -132,9 +132,9 @@ def get_na_conferencii_events() -> list:
                 continue
 
             event.description = event_additional_info["description"]
-            for tag_type_name in event_additional_info["event_tags"]:
-                event.tags.add(Tag.objects.get(tag_code=tag_types[tag_type_name]))
-            
+            # for tag_type_name in event_additional_info["event_tags"]:
+            #     event.tags.add(Tag.objects.get(tag_code=tag_types[tag_type_name]).tag_code)
+            #
             event.type_of_event = EventTypeClissifier \
                 .objects.get(type_code=event_types["Конференция"])
 
