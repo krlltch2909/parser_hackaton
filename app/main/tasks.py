@@ -1,4 +1,3 @@
-import time
 from datetime import datetime
 from celery import shared_task
 from dateutil.relativedelta import relativedelta
@@ -61,9 +60,7 @@ def parse_new_events() -> None:
             print("Runtime error")
         except Exception as e:
             print("error " + str(e))
-            print(e.__str__())
             print(e.args)
-            print(e.with_traceback())
 
     time_end = datetime.now() - time_start
     print(time_end)

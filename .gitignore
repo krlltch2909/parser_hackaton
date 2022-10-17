@@ -12,7 +12,7 @@ nginx_conf/logs/
 
 .DS_Store
 
-
+app/supervisor/logs/
 app/db.sqlite3
 .idea/
 app/.env/

@@ -20,3 +20,4 @@ venv/
 db.server
 
 postgres/
+supervisor/logs/

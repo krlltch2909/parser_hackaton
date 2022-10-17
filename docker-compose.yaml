@@ -32,52 +32,29 @@ services:
 #      - 8000
     ports:
       - "8000:8000"
-    command: > 
-      sh runscript.sh
+#    command: >
+#      sh runscript.sh
     depends_on:
       - postgres
     volumes:
       - ./app:/server
-# worker для асинхронной работы и исполнения переодических задач
-  worker:
-    container_name: celery_worker
-#    restart: always
-    build:
-      context: app/
-    env_file:
-      - ./app/.env
-    command: >
-      sh -c "celery -A app worker -l INFO"
-    depends_on:
-      - django
+      - ./app/supervisor/logs/:/var/log
 
-# worker для назначения переодических задач
-  celery_beats:
-    container_name: celery_beats_worker
-#    restart: always
-    build:
-      context: app/
-    env_file:
-      - ./app/.env
-    command: >
-      sh -c " celery -A app beat -l INFO
-      --scheduler django_celery_beat.schedulers:DatabaseScheduler"
-    depends_on:
-      - django
+
 
 # веб-сервис nginx
-  nginx:
-#    restart: always
-    image: nginx:latest
-    container_name: nginx
-    volumes:
-      - ./nginx_conf/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx_conf/logs/:/etc/nginx/logs/
-      - ./app:/server
-    ports:
-      - "80:80"
-    depends_on:
-      - django
+#  nginx:
+##    restart: always
+#    image: nginx:latest
+#    container_name: nginx
+#    volumes:
+#      - ./nginx_conf/nginx.conf:/etc/nginx/nginx.conf
+#      - ./nginx_conf/logs/:/etc/nginx/logs/
+#      - ./app:/server
+#    ports:
+#      - "80:80"
+#    depends_on:
+#      - django
 
 volumes:
   postgres:
