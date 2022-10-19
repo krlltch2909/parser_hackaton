@@ -17,12 +17,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include, re_path
-from main.views import TypeTitleAPIView, TagPIView
+from main.views import TypeTitleAPIView, TagAPIView, EventTypeAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/hackaton/', TypeTitleAPIView.as_view()),
-    path('api/hackaton/tags/', TagPIView.as_view()),
+    path('api/hackaton/tags/', TagAPIView.as_view()),
+    path('api/hackaton/types/', EventTypeAPIView.as_view()),
     path('api/auth/', include('djoser.urls')),
     re_path('api/auth/', include('djoser.urls.authtoken')),
 

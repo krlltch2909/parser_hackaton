@@ -4,8 +4,10 @@ from django.db import models
 # Create your models here.
 
 
-# классификатор типов события
 class EventTypeClissifier(models.Model):
+    """
+    классификатор типов события
+    """
     type_code = models.SmallIntegerField(primary_key=True)
     description = models.CharField(max_length=255)
 
@@ -14,6 +16,9 @@ class EventTypeClissifier(models.Model):
 
 
 class Tag(models.Model):
+    """
+    классификатор тегов
+    """
     tag_code = models.SmallIntegerField(primary_key=True)
     description = models.CharField(max_length=255)
 
@@ -22,6 +27,9 @@ class Tag(models.Model):
 
 
 class Event(models.Model):
+    """
+    модель всех событий
+    """
     title = models.CharField(max_length=255)
     description = models.TextField()
 
@@ -41,8 +49,5 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
-
-    # def __str__(self):
-    #     return self.title + " " + self.url
 
 

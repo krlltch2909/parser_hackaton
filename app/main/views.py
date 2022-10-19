@@ -1,7 +1,7 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .models import Event, Tag
-from .serializer import EventSerializer, TagSerializer
+from .models import Event, Tag, EventTypeClissifier
+from .serializer import EventSerializer, TagSerializer, EventTypeSerializer
 
 
 class TypeTitleAPIView(generics.ListAPIView):
@@ -10,28 +10,46 @@ class TypeTitleAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         """
-        Optionally restricts the returned events to a given user,
-        by filtering against a `type_of_event` query parameter in the URL.
+        апи для мерорпиятий
+        параметры фильтрации:
+            тег: один или много => tags
+            тип события: один или много => type_of_event
+        критерии для фильтрации передаются в запросе как параметры
         """
-        queryset = Event.objects.all()
 
-        type_of_event_get = self.request.query_params.get('type_of_event')
-        if type_of_event_get is not None:
-            queryset = queryset.filter(type_of_event=type_of_event_get)
-
-
+        type_of_event_get = self.request.query_params.getlist('type_of_event')
         tags = self.request.query_params.getlist('tags')
-        print(tags)
-        if len(tags) > 0:
-            return_rez = queryset.filter(tags__tag_code=int(tags[0]))
-            tags.pop(0)
-            for i in tags:
-                return_rez = return_rez.union(queryset.filter(tags__tag_code=int(i)))
-            return return_rez
-        return queryset
+        rez = []
+        for type_event in type_of_event_get:
+            if len(tags) > 0:
+                for i in tags:
+                    half_rez = Event.objects.filter(tags__tag_code=int(i))
+                    if len(rez) == 0:
+                        rez = half_rez
+                    else:
+                        rez = rez.union(half_rez)
+            else:
+                half_rez = Event.objects.filter(type_of_event=int(type_event))
+                if len(rez) == 0:
+                    rez = half_rez
+                else:
+                    rez = rez.union(half_rez)
+        return rez
 
 
-class TagPIView(generics.ListAPIView):
+class TagAPIView(generics.ListAPIView):
+    """
+    апи для всех тегов, фильтроции нет
+    """
     permission_classes = [IsAuthenticated, ]
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+
+
+class EventTypeAPIView(generics.ListAPIView):
+    """
+    апи для всех типов, фильтроции нет
+    """
+    permission_classes = [IsAuthenticated, ]
+    queryset = EventTypeClissifier.objects.all()
+    serializer_class = EventTypeSerializer
