@@ -4,8 +4,7 @@ app/postgres/db/
 
 app/db.server
 
-
-app/.env
+*.env
 nginx_conf/logs/
 */__pycache__/
 **/__pycache__/
@@ -15,6 +14,5 @@ nginx_conf/logs/
 app/supervisor/logs/
 app/db.sqlite3
 .idea/
-app/.env/
-app/.venv/
-app/venv/
+*env/
+*venv/

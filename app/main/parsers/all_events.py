@@ -56,10 +56,11 @@ def get_all_events() -> list:
             for description_item in description_items:
                 description += re.sub(CLEANER, "", str(description_item).strip(" \n\t\r"))
 
+            description = description.replace("\t", "")
+            description = description.replace("\r", "")
+            description = description.replace("\n\n\n","\n")
+            description = description.replace("\n\n","\n")
             event.description = description
-            event.description = event.description.replace("\n\n","")
-            event.description = event.description.replace("\t", "")
-            event.description = event.description.replace("\r", "")
 
             raw_start_date = raw_event.find(name="div", 
                                             attrs={"itemprop": "startDate"}) \

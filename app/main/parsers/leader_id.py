@@ -54,7 +54,7 @@ def get_leader_id_events() -> list:
         for description_block in event_description_info["blocks"]:
             description_block_data = description_block["data"]
             if "text" in description_block_data.keys():
-                description += re.sub(CLEANER, "", description_block["data"]["text"])
+                description += re.sub(CLEANER, "", description_block["data"]["text"] + "\n")
         
         event.description = description
 
