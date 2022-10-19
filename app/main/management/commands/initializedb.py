@@ -14,10 +14,16 @@ class Command(BaseCommand):
             EventTypeClissifier.objects.create(type_code=5, description='Конкурс')
 
         if len(Tag.objects.all()) == 0:
-            Tag.objects.create(tag_code=1, description="Big Data")
-            Tag.objects.create(tag_code=2, description="Информационная безопасность")
-            Tag.objects.create(tag_code=3, description="РИНЦ")
-            Tag.objects.create(tag_code=4, description="Перечень ВАК")
-            Tag.objects.create(tag_code=5, description="Scopus")
-            Tag.objects.create(tag_code=6, description="Web of Science")
+            Tag.objects.create(tag_code=1, description="РИНЦ")
+            Tag.objects.create(tag_code=2, description="Перечень ВАК")
+            Tag.objects.create(tag_code=3, description="Scopus")
+            Tag.objects.create(tag_code=4, description="Web of Science")
 
+            Tag.objects.create(tag_code=5, description="Управление данными")
+            Tag.objects.create(tag_code=6, description="Информационная безопасность")
+            Tag.objects.create(tag_code=7, description="Машинное обучение")
+            Tag.objects.create(tag_code=8, description="Искусственный интеллект")
+            Tag.objects.create(tag_code=9, description="Виртуальная реальность")
+            Tag.objects.create(tag_code=10, description="Дополненная реальность")
+            Tag.objects.create(tag_code=11, description="Интернет вещей")
+            Tag.objects.create(tag_code=12, description="Робототехника")

@@ -67,16 +67,15 @@ def parse_new_events() -> None:
     print(len(return_rez))
 
     saved_events = Event.objects.all()
-
     for event in return_rez:
         try:
             find_same_event = saved_events.filter(title=event.title, start_date=event.start_date)
 
             if len(find_same_event) == 0:
                 event.save()
-            else:
-                for i in find_same_event:
-                    print(f"bd event {i.title} | found new event {event.title}")
+            # else:
+            #     for i in find_same_event:
+            #         print(f"bd event {i.title} | found new event {event.title}")
 
         except Exception as e:
             print("error in saving " + str(e))
