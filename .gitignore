@@ -16,3 +16,4 @@ app/db.sqlite3
 .idea/
 *env/
 *venv/
+app/supervisord.log

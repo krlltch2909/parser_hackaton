@@ -32,14 +32,11 @@ services:
 #      - 8000
     ports:
       - "8000:8000"
-#    command: >
-#      sh runscript.sh
     depends_on:
       - postgres
     volumes:
       - ./app:/server
       - ./app/supervisor/logs/:/var/log
-
 
 
 # веб-сервис nginx
