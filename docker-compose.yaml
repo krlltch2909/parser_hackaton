@@ -39,6 +39,23 @@ services:
       - ./app/supervisor/logs/:/var/log
 
 
+
+  bot:
+    container_name: bot
+    restart: unless-stopped
+    build:
+      context: bot/
+    command: >
+      sh -c "python app.py"
+    env_file:
+      - ./bot/.env
+    ports:
+      - 8081:8081
+    depends_on:
+      - django
+      - postgres
+
+
 # веб-сервис nginx
 #  nginx:
 ##    restart: always
@@ -55,3 +72,4 @@ services:
 
 volumes:
   postgres:
+

@@ -11,7 +11,7 @@ def login() -> str:
                             data=data)
 
     if response.status_code == 400:
-        response = requests.post(url=os.getenv("API_BASE_URL") + "auth/users/", 
+        requests.post(url=os.getenv("API_BASE_URL") + "auth/users/",
                                 data=data)
         response = requests.post(url=os.getenv("API_BASE_URL") + "auth/token/login/", 
                                 data=data)
