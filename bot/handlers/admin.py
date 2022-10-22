@@ -1,6 +1,7 @@
-import os
-from loader import dp, bot
+from loader import dp, bot, admins
 
 
 async def send_to_admin(dp):
-    await bot.send_message(os.getenv("ADMIN_ID"), "Бот запущен")
+    for admin in admins:
+        await bot.send_message(admin, "Бот запущен")
+

@@ -1,5 +1,4 @@
 import aiohttp
-import asyncio
 import os
 from aiogram.types import Message
 from aiogram.dispatcher.filters import Command, Text
@@ -7,12 +6,20 @@ from loader import dp, bot, token
 from keyboards.events_menu import events_menu
 
 
-@dp.message_handler(Command("events"))
-async def get_events_menu(message: Message):
-    await message.delete()
-    await message.answer("Выберите команду", reply_markup=events_menu)
+@dp.message_handler(Command("start"))
+async def show_start_menu(message: Message):
+    await message.answer("Добро пожаловать. Веберите команду /events" \
+        " для начала работы с мероприятиями\nВы также можете выбрать команду /preferences" \
+        " для уточнения интересующих мероприятий")
 
-@dp.message_handler(Text("Получить события"))
+
+@dp.message_handler(Command("events"))
+async def show_menu(message: Message):
+    await message.answer("Выберите интересующий способ получения мероприятий", 
+                        reply_markup=events_menu)
+
+
+@dp.message_handler(Text("Все события"))
 async def get_events_test(message: Message):
     await message.delete()
     async with aiohttp.ClientSession() as session:

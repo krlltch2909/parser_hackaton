@@ -8,7 +8,7 @@ from utils.login import login
 load_dotenv()
 bot = Bot(os.getenv("BOT_TOKEN"), parse_mode="HTML")
 dp = Dispatcher(bot)
-
+admins = os.getenv("ADMINS_ID").split(",")
 django_start = False
 
 while django_start is False:
