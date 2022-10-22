@@ -41,19 +41,20 @@ def update_all(path: str, events: QuerySet, word_counter: int = 5):
                 event_tags[key_for_keys] = 0
 
             for word in text:
-                if len(word) != 0:
-                    word = (soundex.transform(word), word)
-                    for keys_for_word in keys_wth_codes:
-                        for i in keys_wth_codes.get(keys_for_word):
-                            if i[:len(i) + 1] in word[0]:
-                                event_tags[keys_for_word] += 1
+                try:
+                    if len(word) != 0:
+                        word = (soundex.transform(word), word)
+                        for keys_for_word in keys_wth_codes:
+                            for i in keys_wth_codes.get(keys_for_word):
+                                if i[:len(i) + 1] in word[0]:
+                                    event_tags[keys_for_word] += 1
+                except:
+                    print("errror in " + str(word))
 
             for i in event_tags:
                 if event_tags.get(i) >= word_counter:
-                    print(i)
                     tag_for_event = Tag.objects.filter(description=i)
-                    print(tag_for_event)
-                    print("-----------------")
+
                     if len(tag_for_event) > 0:
                         event.tags.add(tag_for_event[0])
                         event.save()
