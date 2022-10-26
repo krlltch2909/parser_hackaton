@@ -64,7 +64,6 @@ class TypeTitleAPIView(generics.ListAPIView):
 
         if len(type_of_event_get) == 0 and len(tags) == 0:
             rez = all_events
-
         return rez.order_by('start_date')
 
 

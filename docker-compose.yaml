@@ -38,7 +38,7 @@ services:
       - ./app:/server
       - ./app/supervisor/logs/:/var/log
 
-
+#
   bot:
     container_name: bot
     restart: unless-stopped
@@ -58,12 +58,13 @@ services:
 # база данных для бота
   mongodb:
     image: mongo:5.0
+    container_name: mongodb
     ports:
       - 27017:27017
     env_file:
       - ./bot/.env
     volumes:
-      - ./bot/mongo:/data/db 
+      - ./bot/mongo/db/:/data/db
 
 # веб-сервис nginx
 #  nginx:
