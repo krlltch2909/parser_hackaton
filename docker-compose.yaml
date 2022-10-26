@@ -39,7 +39,6 @@ services:
       - ./app/supervisor/logs/:/var/log
 
 
-
   bot:
     container_name: bot
     restart: unless-stopped
@@ -54,7 +53,17 @@ services:
     depends_on:
       - django
       - postgres
+      - mongodb
 
+# база данных для бота
+  mongodb:
+    image: mongo:5.0
+    ports:
+      - 27017:27017
+    env_file:
+      - ./bot/.env
+    volumes:
+      - ./bot/mongo:/data/db 
 
 # веб-сервис nginx
 #  nginx:
@@ -69,7 +78,3 @@ services:
 #      - "80:80"
 #    depends_on:
 #      - django
-
-volumes:
-  postgres:
-
