@@ -1,13 +1,14 @@
 import os
 import time
-
 from aiogram import Bot, Dispatcher
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from dotenv import load_dotenv
 from utils.login import login
 
 load_dotenv()
 bot = Bot(os.getenv("BOT_TOKEN"), parse_mode="HTML")
-dp = Dispatcher(bot)
+storage = MemoryStorage()
+dp = Dispatcher(bot=bot, storage=storage)
 admins = os.getenv("ADMINS_ID").split(",")
 django_start = False
 
