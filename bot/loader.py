@@ -10,6 +10,7 @@ bot = Bot(os.getenv("BOT_TOKEN"), parse_mode="HTML")
 storage = MemoryStorage()
 dp = Dispatcher(bot=bot, storage=storage)
 admins = os.getenv("ADMINS_ID").split(",")
+admins = [admin for admin in admins if admin != ""]
 django_start = False
 
 while django_start is False:

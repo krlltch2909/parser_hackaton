@@ -3,7 +3,7 @@ import os
 from aiogram.types import Message
 from aiogram.dispatcher.filters import Command, Text
 from loader import dp, bot, token
-from keyboards.events_menu import events_menu
+from keyboards.default.events_menu import events_menu
 
 
 @dp.message_handler(Command("start"))
