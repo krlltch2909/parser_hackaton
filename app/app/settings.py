@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'main',
 
-    # 'corsheaders',
+     # 'corsheaders',
 
 
     'rest_framework',
@@ -61,7 +61,7 @@ INSTALLED_APPS = [
 # SITE_ID = 0
 
 MIDDLEWARE = [
-    # 'corsheaders.middleware.CorsMiddleware',
+     # 'corsheaders.middleware.CorsMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -80,7 +80,7 @@ ROOT_URLCONF = 'app.urls'
 # del   'corsheaders', and  'corsheaders.middleware.CorsMiddleware',
 # CORS_ORIGIN_ALLOW_ALL = False
 # CORS_ORIGIN_WHITELIST = (
-#   'http://localhost:8080',
+#    'http://localhost:8080',
 # )
 
 TEMPLATES = [
@@ -107,16 +107,15 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 #
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+   'default': {
+       'ENGINE': 'django.db.backends.postgresql',
 
-        'HOST': os.environ.get('POSTGRES_HOST'),
-        'PORT': '5432',
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'NAME': os.environ.get('POSTGRES_DB')
-
-    }
+       'HOST': os.environ.get('POSTGRES_HOST'),
+       'PORT': '5432',
+       'USER': os.environ.get('POSTGRES_USER'),
+       'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+       'NAME': os.environ.get('POSTGRES_DB')
+   }
 }
 
 
@@ -126,7 +125,7 @@ DATABASES = {
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-#
+
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
