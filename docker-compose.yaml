@@ -35,7 +35,7 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./app:/server
+      #      - ./app:/server
       - ./app/supervisor/logs/:/var/log
 
 #

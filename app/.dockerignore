@@ -2,22 +2,21 @@
 .gitignore
 
 .docker
-
+.dockerignore
 
 */__pycache__/
 **/__pycache__/
-
-.idea/
-.env/
-
-.idea/
-.venv/
-venv/
-
 .DS_Store/
+
 .env
 
-db.server
+.idea/
 
-postgres/
-app/supervisor/logs/
+./venv/
+
+
+./db.sqlite3
+
+./postgres
+
+./supervisor/logs/

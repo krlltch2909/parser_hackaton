@@ -2,24 +2,18 @@
 .gitignore
 
 .docker
-.dockerignor
+
+.dockerignore
 
 */__pycache__/
 **/__pycache__/
 
-.idea/
-.env/
-
-.idea/
-
-./venv/
+.idea
 
 venv/
  
 .DS_Store/
 .env
 
-
-./mongo/
 mongo/
 
