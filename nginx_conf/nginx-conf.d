@@ -1,6 +1,8 @@
  upstream parser_hackaton{
 	 server django:8000;
 }
+
+
 server {
 	listen 80;
 	server_name  parser_hackatons;

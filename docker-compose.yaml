@@ -7,6 +7,7 @@ services:
 #    restart: always
     image: redis
 
+
 # база данных
   postgres:
       container_name: postgres
@@ -28,10 +29,10 @@ services:
       context: app/
     env_file:
       - ./app/.env
-#    expose:
-#      - 8000
-    ports:
-      - "8000:8000"
+    expose:
+      - 8000
+        #ports:
+        #- "8000:8000"
     depends_on:
       - postgres
     volumes:
@@ -48,8 +49,8 @@ services:
       sh -c "python app.py"
     env_file:
       - ./bot/.env
-    ports:
-      - 8081:8081
+        #ports:
+      #- 8081:8081
     depends_on:
       - django
       - postgres
@@ -68,7 +69,7 @@ services:
 
 # веб-сервис nginx
   nginx:
-    restart: always
+    restart: unless-stopped
     image: nginx:latest
     container_name: nginx
     volumes:

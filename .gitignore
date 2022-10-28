@@ -5,6 +5,8 @@ app/postgres/db/
 bot/mongo/db/
 
 app/db.server
+app/staticfiles/
+
 
 *.env
 nginx_conf/logs/
