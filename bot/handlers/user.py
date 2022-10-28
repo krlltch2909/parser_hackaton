@@ -4,6 +4,7 @@ from aiogram.types import Message
 from aiogram.dispatcher.filters import Command, Text
 from loader import dp, bot, token
 from keyboards.default.events_menu import events_menu
+from utils.create_event_message import create_event_messsage
 
 
 @dp.message_handler(Command("start"))
@@ -28,5 +29,5 @@ async def get_events_test(message: Message):
         }
         async with session.get(url=os.getenv("API_BASE_URL") +"hackaton/", headers=headers) as response:
             data = await response.json(content_type=None)
-            for event in data[:10]:
-                await bot.send_message(message.from_user.id, text=event["title"])
+            for raw_event in data[:10]:
+                await bot.send_message(message.from_user.id, create_event_messsage(raw_event))
