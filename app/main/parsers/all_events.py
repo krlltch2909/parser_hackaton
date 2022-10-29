@@ -54,13 +54,20 @@ def get_all_events() -> list:
             
             description = ""
             for description_item in description_items:
-                description += re.sub(CLEANER, "", str(description_item).strip(" \n\t\r"))
+                description += re.sub(CLEANER, "", str(description_item).strip(" \n\t\r")) + "\n"
 
             description = description.replace("\t", "")
             description = description.replace("\r", "")
             description = description.replace("\n\n\n","\n")
             description = description.replace("\n\n","\n")
             event.description = description
+
+            # Добавляем теги к описанию
+            tags_div = event_additional_data.find("div", class_="news-topics")
+            if tags_div is not None:
+                raw_tags = tags_div.find_all("a")
+                for raw_tag in raw_tags:
+                    event.description += (". " + raw_tag.string)
 
             raw_start_date = raw_event.find(name="div", 
                                             attrs={"itemprop": "startDate"}) \
@@ -103,7 +110,6 @@ def get_all_events() -> list:
             raw_event_cost_type = raw_event.find("div", class_="event-price") \
                                            .get("content") \
                                            .strip(" ")
-            # print(raw_event_cost_type)
 
             if raw_event_cost_type == "Бесплатно":
                 event.is_free = True

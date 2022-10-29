@@ -50,6 +50,12 @@ def get_ict2go_events() -> list:
         event.end_date = event_additional_info["end_date"]
         event.is_free = event_additional_info["is_free"]
 
+        # Добавляем теги к описанию
+        tags_div = raw_event.find("div", class_="event-themes")
+        raw_tags = tags_div.find_all("a")
+        for raw_tag in raw_tags:
+            event.description += (raw_tag.string + ". ")
+
         # Устанавливаем московский часовой пояс
         moscow_tz = timezone(timedelta(hours=3))
         event.start_date = event.start_date.replace(tzinfo=moscow_tz)
