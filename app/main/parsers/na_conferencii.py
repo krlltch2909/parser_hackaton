@@ -40,29 +40,8 @@ def get_na_conferencii_events() -> list:
     Возвращает конференции с сайта: 
     https://na-konferencii.ru/
     """
-    # url = "https://na-konferencii.ru/wp-admin/admin-ajax.php"
     url = "https://na-konferencii.ru/conference-type/konferencii"
 
-    # # Строка для более конкретного поиска по сайту
-    # base_data_string= f"action=filterhome&nonce={_get_nonce_key()}"
-    # for category in categories.values():
-    #     base_data_string += f"&category%5B%5D={category}"
-    
-    # now = datetime.now()
-    # # Необходимо искать концеренции, начало которых не позже текущей даты
-    # base_data_string += f"&period_start={now.day}%2F{now.month}%2F{now.year}"
-
-    # for ref_category in ref_categories.values():
-    #     base_data_string += f"&ref_category%5B%5D={ref_category}"
-
-    # # Ведем поиск только конференций
-    # base_data_string += "&search_type=konferencii"
-
-    # headers = {
-    #     'Content-Type': 'application/x-www-form-urlencoded'
-    # }
-
-    # base_data_string + "&page=1"
     response = requests.post(url)
     html_decoded_string = html.unescape(response.text)
     page = BeautifulSoup(html_decoded_string, "html.parser")
@@ -72,7 +51,6 @@ def get_na_conferencii_events() -> list:
     if len(page_paragraphs) > 1:
         end_page_number = int(page_paragraphs[-2].string)
         for i in range(2, end_page_number+1):
-            # base_data_string + f"&page={i}"
             response = requests.post(url + f"/page/{i}")
             html_decoded_string = html.unescape(response.text)
             page = BeautifulSoup(html_decoded_string, "html.parser")
@@ -132,9 +110,13 @@ def get_na_conferencii_events() -> list:
                 continue
 
             event.description = event_additional_info["description"]
-            # for tag_type_name in event_additional_info["event_tags"]:
-            #     event.tags.add(Tag.objects.get(tag_code=tag_types[tag_type_name]).tag_code)
-            #
+
+            # Добавляем теги к описанию
+            tags_div = page_raw_event.find("div", class_="notice-item-body-inner")
+            raw_tags = tags_div.find_all("a")
+            for raw_tag in raw_tags:
+                event.description += (". " + raw_tag.string)
+
             event.type_of_event = EventTypeClissifier \
                 .objects.get(type_code=event_types["Конференция"])
 

@@ -50,4 +50,8 @@ class Event(models.Model):
     def __str__(self):
         return self.title
 
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, Event):
+            return self.title == __o.title
+        return False
 

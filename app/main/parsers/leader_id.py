@@ -7,9 +7,7 @@ from .utils import event_types, CLEANER
 
 
 _themeIds = [
-    603, 599, 608, 610, 602, 606, 609, 605, 612,
-    600, 604, 1227, 601, 613, 607, 611, 749,
-    742, 36, 745, 37, 698, 753, 751
+    1227, 749, 742, 36, 745, 37, 753, 751, 50
 ]
 
 def get_leader_id_events() -> list:
@@ -26,13 +24,12 @@ def get_leader_id_events() -> list:
     url = base_url + additional_url
     response = requests.get(url + "&paginationPage=1")
     data = response.json()
-
+    pages_count = data["data"]["_meta"]["pageCount"]
     raw_events = []
-    while response.status_code != 422:
-        raw_events.extend(data["data"]["_items"])
-        current_page = data["data"]["_meta"]["currentPage"]
 
-        response = requests.get(url + f"&paginationPage={current_page+1}")
+    for i in range(2, pages_count + 1):        
+        raw_events.extend(data["data"]["_items"])
+        response = requests.get(url + f"&paginationPage={i}")
         data = response.json()
 
     events = []
@@ -41,10 +38,12 @@ def get_leader_id_events() -> list:
 
         if raw_event["timezone"] is None:
             continue
-
-        event_raw_type = raw_event["type"]["name"]
         
+        if raw_event["type"] is None:
+            continue
+
         # Если данного типа мерроприятия нет в списке, то пропускаем его
+        event_raw_type = raw_event["type"]["name"]
         if event_raw_type not in event_types.keys():
             continue
 
@@ -86,6 +85,7 @@ def get_leader_id_events() -> list:
         event.type_of_event = EventTypeClissifier \
                 .objects.get(type_code=event_types[event_raw_type])
 
-        events.append(event)
+        if event not in events:
+            events.append(event)
 
     return events
