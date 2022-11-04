@@ -31,7 +31,25 @@ async def get_events() -> dict:
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url=url, headers=headers) as response:
-            data = await  response.json(content_type=None)
+            data = await response.json(content_type=None)
+            return data
+
+
+async def get_events_by_preferences(events_types: List[int], tags: List[int]) -> dict:
+    url = os.getenv("API_BASE_URL") + "hackaton/?"
+    headers = {
+        "Authorization": "Token " + token
+    }
+
+    for event_type in events_types:
+        url += f"type_of_event={event_type}&"
+
+    for tag in tags:
+        url += f"tags={tag}&"
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url=url, headers=headers) as response:
+            data = await response.json(content_type=None)
             return data
 
 

@@ -9,7 +9,7 @@ from keyboards.inline.mailing_prefs.mailing_type_keyboard import mailing_type_ke
 from utils.create_message import create_event_messsage
 from utils.get_indexes import get_indexes
 from utils.database import user_preferences_collection
-from utils.parser_api import get_events
+from utils.parser_api import get_events, get_events_by_preferences
 from states.MailingPreferencesStatesGroup import MailingPreferencesStatesGroup
 
 
@@ -27,10 +27,30 @@ async def show_events_menu(message: types.Message):
                         reply_markup=events_menu)
 
 
-@dp.message_handler(Text("Все события"))
+@dp.message_handler(lambda message: message.text and message.text in ["Все события", "Интересующие события"])
 async def get_all_events(message: types.Message, state: FSMContext):
     # Получаем все события из API
-    data = await get_events()
+    data = None
+
+    if message.text == "Все события":
+        data = await get_events()
+    elif message.text == "Интересующие события":
+        user_preferences = await user_preferences_collection.find_one({"_id": message.from_user.id})
+        if user_preferences is not None:
+            events_types = user_preferences["events_types"]
+            tags = user_preferences["tags"]
+
+            if len(events_types) == 0 and len(tags) == 0:
+                bot.send_message(message.from_user.id, text="Вы не указали ваши предпочтения.\n" \
+                    "Воспользуйтесь командой /preferences.")
+                return
+            else:
+                data = await get_events_by_preferences(events_types, tags)
+        else:
+            bot.send_message(message.from_user.id, text="Для того, чтобы воспользоваться данной" \
+                " функцией вы должны указать свои предпочтения, " \
+                "воспользовавшись командой /preferences.")
+            return
 
     # Сохраняем ивенты в состояние
     await state.update_data(events=data)

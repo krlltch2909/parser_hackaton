@@ -19,7 +19,7 @@ def add_control_buttons(inline_keyboard: List[InlineKeyboardButton],
     elif start_index + page_size < len(objects) - 1:
         inline_keyboard.append([InlineKeyboardButton(text=">>", 
             callback_data=data.new(**data_params, button_type="next"))])
-    elif start_index + page_size > len(objects) - 1:
+    elif start_index + page_size > len(objects) - 1 and len(objects) > page_size:
         inline_keyboard.append([InlineKeyboardButton(text="<<", 
             callback_data=data.new(**data_params , button_type="back"))])
     inline_keyboard.append([InlineKeyboardButton(text="Готово", 
