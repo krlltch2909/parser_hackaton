@@ -13,6 +13,8 @@ nginx_conf/logs/
 */__pycache__/
 **/__pycache__/
 
+*.fleet/
+
 .DS_Store
 
 app/supervisor/logs/

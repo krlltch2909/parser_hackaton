@@ -3,8 +3,8 @@ from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
 from loader import dp, bot
 from states.PreferencesStatesGroup import PreferencesStatesGroup
-from keyboards.inline.events_types_keyboard import generate_events_types_markup
-from keyboards.inline.tags_keyboard import generate_tags_markup
+from keyboards.inline.events_prefs.events_types_keyboard import generate_events_types_markup
+from keyboards.inline.events_prefs.tags_keyboard import generate_tags_markup
 from utils.database import user_preferences_collection
 
 
@@ -20,20 +20,19 @@ async def start_pref_setting(message: types.Message, state: FSMContext):
     data = await state.get_data()
     if "events_types" not in data.keys():
         await state.update_data(events_types=[])
-    
+
     if "tags" not in data.keys():
         await state.update_data(tags=[])
 
     data = await state.get_data()
     await message.answer("Выберите интересующие вас виды мероприятий:",
-        reply_markup=await generate_events_types_markup(data["events_types"], 
-                                                        data["current_page"]))
+                         reply_markup=generate_events_types_markup(data["events_types"], data["current_page"]))
 
-    # Перенаправляем на хендлер-обработчик ответа    
+    # Перенаправляем на хендлер-обработчик ответа
     await PreferencesStatesGroup.events_types.set()
 
 
-# Получаем новый тип мероприятия. 
+# Получаем новый тип мероприятия.
 # Сохраняем его в машину состояний и изменяем разметку
 @dp.callback_query_handler(text_contains="event_type",
                            state=PreferencesStatesGroup.events_types)
@@ -46,14 +45,14 @@ async def accept_event_type(query: types.CallbackQuery, state: FSMContext):
 
     if button_type == "back":
         new_page = data.get("current_page") - 1
-        await query.message.edit_reply_markup(await generate_events_types_markup(data.get("events_types"), 
-            new_page))
+        await query.message.edit_reply_markup(generate_events_types_markup(data.get("events_types"),
+                                                                           new_page))
         await state.update_data(current_page=new_page)
         await PreferencesStatesGroup.events_types.set()
     elif button_type == "next":
         new_page = data.get("current_page") + 1
-        await query.message.edit_reply_markup(await generate_events_types_markup(data.get("events_types"), 
-            new_page))
+        await query.message.edit_reply_markup(generate_events_types_markup(data.get("events_types"),
+                                                                           new_page))
         await state.update_data(current_page=new_page)
         await PreferencesStatesGroup.events_types.set()
     elif button_type == "done":
@@ -67,20 +66,21 @@ async def accept_event_type(query: types.CallbackQuery, state: FSMContext):
             await query.message.delete()
 
             # Отправляем сообщение с выбором тегов
-            await bot.send_message(chat_id=chat_id, 
+            await bot.send_message(chat_id=chat_id,
                 text="Выберите теги для фильтрации интересующих мероприятий:",
-                reply_markup=await generate_tags_markup(data["tags"], data["current_page"]))
-    
+                reply_markup=generate_tags_markup(data["tags"], data["current_page"]))
+
         await PreferencesStatesGroup.tags.set()
     else:
         async with state.proxy() as data:
             events_types = add_code(data["events_types"], type_code)
             data["events_types"] = events_types
 
-        await query.message.edit_reply_markup(await generate_events_types_markup(data["events_types"], 
+        await query.message.edit_reply_markup(generate_events_types_markup(data["events_types"],
             data["current_page"]))
 
 
+# Получаем и сохраняем новые теги
 @dp.callback_query_handler(text_contains="event_tag", state=PreferencesStatesGroup.tags)
 async def accept_tag(query: types.CallbackQuery, state: FSMContext):
     callback_data = query.data
@@ -91,13 +91,13 @@ async def accept_tag(query: types.CallbackQuery, state: FSMContext):
 
     if button_type == "back":
         new_page = data.get("current_page") - 1
-        await query.message.edit_reply_markup(await generate_tags_markup(data.get("tags"), 
+        await query.message.edit_reply_markup(generate_tags_markup(data.get("tags"),
             new_page))
         await state.update_data(current_page=new_page)
         await PreferencesStatesGroup.tags.set()
     elif button_type == "next":
         new_page = data.get("current_page") + 1
-        await query.message.edit_reply_markup(await generate_tags_markup(data.get("tags"), 
+        await query.message.edit_reply_markup(generate_tags_markup(data.get("tags"),
             new_page))
         await state.update_data(current_page=new_page)
         await PreferencesStatesGroup.tags.set()
@@ -114,9 +114,9 @@ async def accept_tag(query: types.CallbackQuery, state: FSMContext):
             }
             update_data = {
                 "events_types": events_types,
-                "tags": tags  
+                "tags": tags
             }
-            
+
             # Сохранить предпочтения пользователя
             user_preferences = await user_preferences_collection.find_one({"_id": user_id})
 
@@ -129,25 +129,25 @@ async def accept_tag(query: types.CallbackQuery, state: FSMContext):
 
             await query.message.delete()
             await bot.send_message(chat_id=user_id, text="Настройки успешно сохранены")
-
+        # Очистка состояния. Можно ли хранить предпочтения всегда в машине состояний?
         await state.finish()
     else:
         async with state.proxy() as data:
             tags = add_code(data["tags"], tag_code)
             data["tags"] = tags
 
-        await query.message.edit_reply_markup(await generate_tags_markup(data["tags"], 
+        await query.message.edit_reply_markup(generate_tags_markup(data["tags"],
             data["current_page"]))
 
 
-def add_code(already_exists_codes: list, code: int) -> None:
+def add_code(already_exists_codes: list, code: int) -> list:
     if type(already_exists_codes) is not list:
         already_exists_codes = []
-        
+
     # Если тип мероприятия уже есть в списке, значит удаляем
     if code in already_exists_codes:
         already_exists_codes.remove(code)
     else:
         already_exists_codes.append(code)
-    
+
     return already_exists_codes

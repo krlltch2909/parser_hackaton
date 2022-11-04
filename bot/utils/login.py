@@ -15,8 +15,8 @@ def login() -> str:
                                 data=data)
         response = requests.post(url=os.getenv("API_BASE_URL") + "auth/token/login/", 
                                 data=data)
-        jsonData = response.json()
-        return jsonData["auth_token"]
+        json_data = response.json()
+        return json_data["auth_token"]
     else:
-        jsonData = response.json()
-        return jsonData["auth_token"]
+        json_data = response.json()
+        return json_data["auth_token"]

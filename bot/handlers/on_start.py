@@ -7,8 +7,10 @@ async def on_start(dp):
     await bot.set_my_commands(
         commands=[
             BotCommand("events", "Открыть меню мероприятий"),
-            BotCommand("preferences", "Настроить интересы")
+            BotCommand("preferences", "Настроить интересы"),
+            BotCommand("mailing", "Настройка рассылки мероприятий")
         ],
         scope=BotCommandScopeDefault()
     )
     await send_to_admin(dp)
+    

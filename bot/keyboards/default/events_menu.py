@@ -6,11 +6,9 @@ events_menu = ReplyKeyboardMarkup(
         [
             KeyboardButton("Все события"),
             KeyboardButton("Интересующие события")
-        ],
-        [
-            KeyboardButton("Режим рассылки всех событий"),
-            KeyboardButton("Режим рассылки интересующих событий")
         ]
     ],
-    resize_keyboard=False
+    resize_keyboard=True,
+    one_time_keyboard=False,
+    selective=False
 )
