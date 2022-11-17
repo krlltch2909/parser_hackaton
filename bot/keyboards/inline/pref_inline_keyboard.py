@@ -1,3 +1,4 @@
+import os
 from aiogram.utils.callback_data import CallbackData
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from typing import List, Union
@@ -5,7 +6,9 @@ from models.EventTag import EventTag
 from models.EventType import EventType
 from utils.get_indexes import get_indexes
 from .utils import add_control_buttons
-from . import PAGE_SIZE
+
+
+PAGE_SIZE = os.getenv("PREF_PAGE_SIZE")
 
 
 def generate_events_pref_inline_keyboard(code_objects: Union[List[EventType], List[EventTag]],

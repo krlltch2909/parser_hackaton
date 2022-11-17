@@ -1,16 +1,14 @@
-import json
+import os
 from aiogram import types
-from aiogram.dispatcher.filters import Command, Text
+from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
 from loader import dp, bot
 from keyboards.default.events_menu import events_menu
 from keyboards.inline.events_list_keyboard import get_events_list_keyboard
-from keyboards.inline.mailing_prefs.mailing_type_keyboard import mailing_type_keyboard
-from utils.create_message import create_event_messsage
+from utils.create_event_message import create_event_messsage
 from utils.get_indexes import get_indexes
 from utils.database import user_preferences_collection
 from utils.parser_api import get_events, get_events_by_preferences
-from states.MailingPreferencesStatesGroup import MailingPreferencesStatesGroup
 
 
 @dp.message_handler(Command("start"))
@@ -29,10 +27,10 @@ async def show_events_menu(message: types.Message):
 
 @dp.message_handler(lambda message: message.text and message.text in ["Все события", "Интересующие события"])
 async def get_all_events(message: types.Message, state: FSMContext):
-    # Получаем все события из API
     data = None
 
     if message.text == "Все события":
+        # Получаем все события из API
         data = await get_events()
     elif message.text == "Интересующие события":
         user_preferences = await user_preferences_collection.find_one({"_id": message.from_user.id})
@@ -55,7 +53,7 @@ async def get_all_events(message: types.Message, state: FSMContext):
     # Сохраняем ивенты в состояние
     await state.update_data(events=data)
     # Количество событий в одном сообщении
-    await state.update_data(page_size=5)
+    await state.update_data(page_size=os.getenv("EVENTS_PAGE_SISE"))
     await state.update_data(current_page=1)
 
     await message.delete()

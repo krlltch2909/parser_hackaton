@@ -5,7 +5,7 @@ from typing import List
 from utils.parser_api import get_tags
 
 
-def generate_tags_markup(checked_tags_codes: List[int],
+async def generate_tags_markup(checked_tags_codes: List[int],
                                page: int) -> InlineKeyboardMarkup:
     tags = await get_tags()
     return generate_events_pref_inline_keyboard(tags,

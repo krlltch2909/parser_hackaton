@@ -6,14 +6,16 @@ from models.EventType import EventType
 from models.EventTag import EventTag
 
 
-async def get_events_types() -> List[EventType]:
-    url = os.getenv("API_BASE_URL") + "hackaton/types/"
-    headers = {
+_headers = {
         "Authorization": "Token " + token
     }
 
+
+async def get_events_types() -> List[EventType]:
+    url = os.getenv("API_BASE_URL") + "hackaton/types/"
+
     async with aiohttp.ClientSession() as session:
-        async with session.get(url=url, headers=headers) as response:
+        async with session.get(url=url, headers=_headers) as response:
             data = await response.json(content_type=None)
             events = []
             for raw_event in data:
@@ -25,21 +27,15 @@ async def get_events_types() -> List[EventType]:
 
 async def get_events() -> dict:
     url = os.getenv("API_BASE_URL") + "hackaton/"
-    headers = {
-        "Authorization": "Token " + token
-    }
 
     async with aiohttp.ClientSession() as session:
-        async with session.get(url=url, headers=headers) as response:
+        async with session.get(url=url, headers=_headers) as response:
             data = await response.json(content_type=None)
             return data
 
 
 async def get_events_by_preferences(events_types: List[int], tags: List[int]) -> dict:
     url = os.getenv("API_BASE_URL") + "hackaton/?"
-    headers = {
-        "Authorization": "Token " + token
-    }
 
     for event_type in events_types:
         url += f"type_of_event={event_type}&"
@@ -48,19 +44,16 @@ async def get_events_by_preferences(events_types: List[int], tags: List[int]) ->
         url += f"tags={tag}&"
 
     async with aiohttp.ClientSession() as session:
-        async with session.get(url=url, headers=headers) as response:
+        async with session.get(url=url, headers=_headers) as response:
             data = await response.json(content_type=None)
             return data
 
 
 async def get_tags() -> List[EventTag]:
     url = os.getenv("API_BASE_URL") + "hackaton/tags/"
-    headers = {
-        "Authorization": "Token " + token
-    }
 
     async with aiohttp.ClientSession() as session:
-        async with session.get(url=url, headers=headers) as response:
+        async with session.get(url=url, headers=_headers) as response:
             data = await response.json(content_type=None)
 
             tags = []

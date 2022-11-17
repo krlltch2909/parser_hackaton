@@ -3,7 +3,8 @@ from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
 from loader import dp, bot
 from states.PreferencesStatesGroup import PreferencesStatesGroup
-from keyboards.inline.events_prefs.events_types_keyboard import generate_events_types_markup
+from keyboards.inline.events_prefs. \
+    events_types_keyboard import generate_events_types_markup
 from keyboards.inline.events_prefs.tags_keyboard import generate_tags_markup
 from utils.database import user_preferences_collection
 
@@ -11,7 +12,8 @@ from utils.database import user_preferences_collection
 @dp.message_handler(Command("preferences"))
 async def start_pref_setting(message: types.Message, state: FSMContext):
     # Загружаем уже существующие предпочтения пользователя
-    user_preferences = await user_preferences_collection.find_one({"_id": message.from_user.id})
+    user_preferences = await user_preferences_collection. \
+        find_one({"_id": message.from_user.id})
     if user_preferences is not None:
         await state.update_data(events_types=user_preferences["events_types"])
         await state.update_data(tags=user_preferences["tags"])
@@ -26,7 +28,8 @@ async def start_pref_setting(message: types.Message, state: FSMContext):
 
     data = await state.get_data()
     await message.answer("Выберите интересующие вас виды мероприятий:",
-                         reply_markup=generate_events_types_markup(data["events_types"], data["current_page"]))
+                         reply_markup=await generate_events_types_markup(data["events_types"], 
+                                                                          data["current_page"]))
 
     # Перенаправляем на хендлер-обработчик ответа
     await PreferencesStatesGroup.events_types.set()
@@ -45,14 +48,16 @@ async def accept_event_type(query: types.CallbackQuery, state: FSMContext):
 
     if button_type == "back":
         new_page = data.get("current_page") - 1
-        await query.message.edit_reply_markup(generate_events_types_markup(data.get("events_types"),
-                                                                           new_page))
+        await query.message.\
+            edit_reply_markup(await generate_events_types_markup(data.get("events_types"),
+                                                                 new_page))
         await state.update_data(current_page=new_page)
         await PreferencesStatesGroup.events_types.set()
     elif button_type == "next":
         new_page = data.get("current_page") + 1
-        await query.message.edit_reply_markup(generate_events_types_markup(data.get("events_types"),
-                                                                           new_page))
+        await query.message.\
+            edit_reply_markup(await generate_events_types_markup(data.get("events_types"),
+                                                                 new_page))
         await state.update_data(current_page=new_page)
         await PreferencesStatesGroup.events_types.set()
     elif button_type == "done":
@@ -68,7 +73,7 @@ async def accept_event_type(query: types.CallbackQuery, state: FSMContext):
             # Отправляем сообщение с выбором тегов
             await bot.send_message(chat_id=chat_id,
                 text="Выберите теги для фильтрации интересующих мероприятий:",
-                reply_markup=generate_tags_markup(data["tags"], data["current_page"]))
+                reply_markup=await generate_tags_markup(data["tags"], data["current_page"]))
 
         await PreferencesStatesGroup.tags.set()
     else:
@@ -76,8 +81,9 @@ async def accept_event_type(query: types.CallbackQuery, state: FSMContext):
             events_types = add_code(data["events_types"], type_code)
             data["events_types"] = events_types
 
-        await query.message.edit_reply_markup(generate_events_types_markup(data["events_types"],
-            data["current_page"]))
+        await query.message.\
+            edit_reply_markup(await generate_events_types_markup(data["events_types"],
+                                                                 data["current_page"]))
 
 
 # Получаем и сохраняем новые теги
@@ -91,13 +97,13 @@ async def accept_tag(query: types.CallbackQuery, state: FSMContext):
 
     if button_type == "back":
         new_page = data.get("current_page") - 1
-        await query.message.edit_reply_markup(generate_tags_markup(data.get("tags"),
+        await query.message.edit_reply_markup(await generate_tags_markup(data.get("tags"),
             new_page))
         await state.update_data(current_page=new_page)
         await PreferencesStatesGroup.tags.set()
     elif button_type == "next":
         new_page = data.get("current_page") + 1
-        await query.message.edit_reply_markup(generate_tags_markup(data.get("tags"),
+        await query.message.edit_reply_markup(await generate_tags_markup(data.get("tags"),
             new_page))
         await state.update_data(current_page=new_page)
         await PreferencesStatesGroup.tags.set()
@@ -136,7 +142,7 @@ async def accept_tag(query: types.CallbackQuery, state: FSMContext):
             tags = add_code(data["tags"], tag_code)
             data["tags"] = tags
 
-        await query.message.edit_reply_markup(generate_tags_markup(data["tags"],
+        await query.message.edit_reply_markup(await generate_tags_markup(data["tags"],
             data["current_page"]))
 
 

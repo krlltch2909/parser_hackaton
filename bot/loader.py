@@ -1,5 +1,6 @@
 import os
 import time
+from timeloop import Timeloop
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from dotenv import load_dotenv
@@ -12,6 +13,7 @@ dp = Dispatcher(bot=bot, storage=storage)
 admins = os.getenv("ADMINS_ID").split(",")
 admins = [admin for admin in admins if admin != ""]
 django_start = False
+timeloop = Timeloop()
 
 while django_start is False:
     try:
