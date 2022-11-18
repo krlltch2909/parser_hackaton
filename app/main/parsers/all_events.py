@@ -9,7 +9,7 @@ from main.models import *
 from .utils import event_types, CLEANER
 
 
-def get_all_events() -> list:
+def get_all_events() -> list[Event]:
     """
     Возвращает список различных событий с сайта:
     'https://all-events.ru/events/'

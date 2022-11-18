@@ -4,8 +4,15 @@ import requests
 from bs4 import BeautifulSoup
 from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
+from typing import TypedDict
 from main.models import *
 from .utils import CLEANER, event_types
+
+
+class _EventAdditionalInfo(TypedDict):
+    description: str
+    start_date: datetime
+    end_date: datetime
 
 
 direction_tags = [
@@ -51,9 +58,9 @@ def get_2035_university_events() -> list:
             event.title = page_raw_event.find("h4").string
             event.url = base_url + page_raw_event.find("h4").parent.get("href")
             event.img = page_raw_event.find("img").get("src")
-            status, event_additional_info = _get_event_additional_info(event.url)
+            event_additional_info = _get_event_additional_info(event.url)
             
-            if not status:
+            if event_additional_info is None:
                 continue
 
             event.description = event_additional_info["description"]
@@ -79,13 +86,13 @@ def get_2035_university_events() -> list:
     return events
 
 
-def _get_event_additional_info(event_url) -> tuple:
+def _get_event_additional_info(event_url: str) -> _EventAdditionalInfo | None:
     response = requests.get(event_url)
     html_decoded_string = html.unescape(response.text)
     event_page = BeautifulSoup(html_decoded_string, "html.parser")
     
-    result = {}
-
+    description = ""
+    
     h3_tags = event_page.find_all("h3")
     description_headers_list = [h for h in h3_tags 
         if h.string is not None and "Об акселераторе:" in h.string
@@ -102,7 +109,6 @@ def _get_event_additional_info(event_url) -> tuple:
         description = ""
         for description_paragraph in description_paragraphs:
             description += f"\n{re.sub(CLEANER, '', description_paragraph)}"
-        result["description"] = description
 
     all_bold_tags = event_page.find_all("b")
     date_paragraph_list = [b.parent for b in all_bold_tags 
@@ -115,10 +121,12 @@ def _get_event_additional_info(event_url) -> tuple:
                                     .replace("\n", "") 
 
         date_strings = date_string.split("-")
-        result["start_date"] = datetime.strptime(date_strings[0], "%d.%m.%Y")
-        result["end_date"] = datetime.strptime(date_strings[1], "%d.%m.%Y")
+        start_date = datetime.strptime(date_strings[0], "%d.%m.%Y")
+        end_date = datetime.strptime(date_strings[1], "%d.%m.%Y")
 
-        return (True, result)
+        return _EventAdditionalInfo(description=description, 
+                                    start_date=start_date, 
+                                    end_date=end_date)
     
     # Если нет дат начала и конца, то нужно пропустить
-    return (False, result)
+    return None

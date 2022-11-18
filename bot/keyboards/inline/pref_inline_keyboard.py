@@ -8,7 +8,7 @@ from utils.get_indexes import get_indexes
 from .utils import add_control_buttons
 
 
-PAGE_SIZE = os.getenv("PREF_PAGE_SIZE")
+PAGE_SIZE =  os.getenv("PREF_PAGE_SIZE")
 
 
 def generate_events_pref_inline_keyboard(code_objects: Union[List[EventType], List[EventTag]],
@@ -23,11 +23,11 @@ def generate_events_pref_inline_keyboard(code_objects: Union[List[EventType], Li
         if code_object.type_code in checked_codes:
             button = InlineKeyboardButton(text="✓ " + code_object.description, 
                 callback_data=type_data.new(type_code=code_object.type_code, 
-                                                  button_type="basic"))
+                                            button_type="basic"))
         else:
             button = InlineKeyboardButton(text=code_object.description, 
                 callback_data=type_data.new(type_code=code_object.type_code, 
-                                                  button_type="basic"))
+                                            button_type="basic"))
 
         inline_keyboard.append([button])
 

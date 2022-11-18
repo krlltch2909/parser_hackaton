@@ -5,8 +5,16 @@ import requests
 from bs4 import BeautifulSoup
 from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
+from typing import TypedDict
 from main.models import *
 from .utils import event_types, tag_types
+
+
+class _EventAdditionalInfo(TypedDict):
+    description: str
+    is_free: bool | None
+    event_tags: list[str]
+        
 
 # Категории мероприятий
 categories = {
@@ -131,7 +139,7 @@ def get_na_conferencii_events() -> list:
     return events
 
 
-def _get_event_additional_info(event_url) -> dict:
+def _get_event_additional_info(event_url: str) -> tuple[bool, _EventAdditionalInfo]:
     result = {}
 
     response = requests.get(event_url)
@@ -163,28 +171,28 @@ def _get_event_additional_info(event_url) -> dict:
         if tag_type_name in tags:
             event_tags.append(tag_type_name)
 
-    result["event_tags"] = event_tags
-
-    result["description"] = description \
+    description = description \
         if len(description) > len(alternative_description) \
         else alternative_description
 
     # Вычисление стоимости конференции
-    result["is_free"] = None
+    is_free = None
     for word in keywords["paid"]["words"]:
         if word in result["description"].lower():
-            result["is_free"] = False
+            is_free = False
     
     for regex in keywords["paid"]["regex"]:
         if re.search(regex, result["description"].lower()):
-            result["is_free"] = False
+            is_free = False
     
     for word in keywords["free"]["words"]:
         if word in result["description"].lower():
-            result["is_free"] = True
+            is_free = True
     
     for regex in keywords["free"]["regex"]:
         if re.search(regex, result["description"].lower()):
-            result["is_free"] = True
+            is_free = True
 
-    return (is_valid_event, result)
+    return (is_valid_event, _EventAdditionalInfo(description=description, 
+                                                 is_free=is_free, 
+                                                 event_tags=event_tags))
