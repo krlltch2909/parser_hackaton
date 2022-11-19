@@ -10,7 +10,7 @@ _themeIds = [
     1227, 749, 742, 36, 745, 37, 753, 751, 50
 ]
 
-def get_leader_id_events() -> list:
+def get_leader_id_events() -> list[Event]:
     """
     Возвращает список событий с сайта:
     'https://leader-id.ru'
@@ -30,7 +30,10 @@ def get_leader_id_events() -> list:
     raw_events = []
 
     for i in range(2, pages_count + 1):    
-        raw_events.extend(data["data"]["_items"])
+        try:  
+            raw_events.extend(data["data"]["_items"])
+        except KeyError:
+            break
         response = requests.get(url + f"&paginationPage={i}")
         data = response.json()
 
@@ -63,6 +66,7 @@ def _get_event(raw_event: dict) -> Event | None:
         return None
 
     event.title = raw_event["full_name"]
+    
     event_description_info = json.loads(raw_event["full_info"])
     description = ""
     for description_block in event_description_info["blocks"]:
@@ -71,6 +75,11 @@ def _get_event(raw_event: dict) -> Event | None:
             description += re.sub(CLEANER, "", description_block["data"]["text"] + "\n")
     
     event.description = description
+
+    # Добавляем темы к описанию. Для более точной работы теггера
+    raw_themes = raw_event["themes"]
+    for raw_theme in raw_themes:
+        event.description += f"{raw_theme['name']}. "
 
     local_tz = timezone(timedelta(minutes=raw_event["timezone"]["minutes"]))
         
@@ -93,6 +102,7 @@ def _get_event(raw_event: dict) -> Event | None:
     event.url = f"https://leader-id.ru/events/{raw_event['id']}"
     event.img = raw_event["photo"]
 
+    # Если указан адрес, то добавляем его
     if raw_event["format"] != "online":
         if raw_event["space"] is not None:
             event.address = raw_event["space"]["address"]["title"]

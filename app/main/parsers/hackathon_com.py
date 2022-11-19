@@ -7,7 +7,7 @@ from main.models import *
 from .utils import CLEANER
 
 
-def get_hackathon_com_events() -> list:
+def get_hackathon_com_events() -> list[Event]:
     """
     Возвращает список хакатонов с сайта:
     'https://xn--80aa3anexr.com/?ysclid=l8dfsnhzg4886000894'
@@ -23,15 +23,18 @@ def get_hackathon_com_events() -> list:
 
         # Очистка текста от html-тегов и других символов
         event.description = re.sub(CLEANER, "", raw_event["descr"])
-        event.registration_deadline = datetime.strptime(raw_event["date"], "%Y-%m-%d %H:%M")
+        event.registration_deadline = datetime\
+            .strptime(raw_event["date"], "%Y-%m-%d %H:%M")
 
         # Установка московского часового пояса
         moscow_tz = timezone(timedelta(hours=3))
-        event.registration_deadline = event.registration_deadline.astimezone(moscow_tz)
+        event.registration_deadline = event.registration_deadline\
+            .astimezone(moscow_tz)
 
         # Проверка на актуальность
-        if event.registration_deadline < datetime.now(tzlocal()).astimezone(moscow_tz):
-            continue
+        if event.registration_deadline < datetime.now(tzlocal())\
+            .astimezone(moscow_tz):
+                continue
 
         event.url = raw_event["url"]
         event.img = raw_event["image"]

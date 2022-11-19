@@ -8,7 +8,7 @@ HACKATHONS = "hackathons"
 CHAMPIOMSHIPS = "championships"
 
 
-def get_hacks_ai_events() -> list:
+def get_hacks_ai_events() -> list[Event]:
     """
     Возвращает хакатоны и чемпионаты с сайта:
     'https://hacks-ai.ru'
@@ -29,7 +29,7 @@ def get_hacks_ai_events() -> list:
     return events
 
 
-def _get_tasks(event_id, event_type) -> list:
+def _get_tasks(event_id: int, event_type: str) -> list[str]:
     task_type = "cases" if event_type == HACKATHONS else "tasks"
     response = requests.get(f"https://hacks-ai.ru/api/v2/{event_type}/{event_id}/{task_type}")
     raw_tasks = response.json()
@@ -41,12 +41,12 @@ def _get_tasks(event_id, event_type) -> list:
     return tasks
 
 
-def _get_event_info(event_id, event_type) -> dict:
+def _get_event_info(event_id: int, event_type) -> dict:
     response = requests.get(f"https://hacks-ai.ru/api/v2/{event_type}/{event_id}/info")
     return response.json()
 
 
-def _fill_event(event, event_id, event_type) -> bool:
+def _fill_event(event: Event, event_id: int, event_type: str) -> bool:
     event_info = _get_event_info(event_id, event_type)
 
     if "registrationDeadline" not in event_info.keys():
@@ -91,12 +91,12 @@ def _fill_event(event, event_id, event_type) -> bool:
     return True
 
 
-def _add_type(events, type) -> list:
-    for event in events:
+def _add_type(raw_events: list[dict], type: str) -> list[dict]:
+    for event in raw_events:
         event["type"] = type
-    return events
+    return raw_events
 
 
-def _check_availability(event_url) -> bool:
+def _check_availability(event_url: str) -> bool:
     response = requests.get(event_url)
     return response.status_code != 404

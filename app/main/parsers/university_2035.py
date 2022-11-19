@@ -20,7 +20,7 @@ direction_tags = [
 ]
 
 
-def get_2035_university_events() -> list:
+def get_2035_university_events() -> list[Event]:
     """
     Возвращает акселераторы с сайта:
     https://pt.2035.university/accelerator

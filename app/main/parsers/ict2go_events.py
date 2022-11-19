@@ -1,13 +1,23 @@
 import html
 import requests
 from bs4 import BeautifulSoup
+from typing import TypedDict
 from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
 from main.models import *
 from .utils import event_types
 
 
-def get_ict2go_events() -> list:
+class _EventAdditionalInfo(TypedDict):
+    description: str
+    is_free: bool | None
+    address: str
+    url: str
+    start_date: datetime
+    end_date: datetime
+
+
+def get_ict2go_events() -> list[Event]:
     """
     Возвраащет разнообразные мероприятия с сайта:
     'https://ict2go.ru'
@@ -70,9 +80,7 @@ def get_ict2go_events() -> list:
     return events
 
 
-def _get_event_additional_info(event_url: str) -> dict:
-    result = {}
-
+def _get_event_additional_info(event_url: str) -> _EventAdditionalInfo:
     response = requests.get(event_url)
     html_decoded_string = html.unescape(response.text)
     soup = BeautifulSoup(html_decoded_string, "html.parser")
@@ -82,18 +90,17 @@ def _get_event_additional_info(event_url: str) -> dict:
     description_lines = [raw_line.string for raw_line in raw_description_lines]
     description_lines_filtered = [line for line in description_lines if line is not None]
     description = "\n".join(description_lines_filtered)
-    result["description"] = description
 
+    url = ""
     if soup.find("a", class_="www-info") is None:
         if soup.find("a", class_="register-info") is not None:
-            result["url"] = soup.find("a", class_="register-info").get("href")
+            url = soup.find("a", class_="register-info").get("href")
         else:
-            result["url"] = event_url
+            url = event_url
     else:
-        result["url"] = soup.find("a", class_="www-info").get("href")
+        url = soup.find("a", class_="www-info").get("href")
 
     address = soup.find("p", class_="place-info").find("a").string
-    result["address"] = address
 
     raw_date_info = soup.find("p", class_="date-info").contents[1]
     raw_date_info = raw_date_info.strip()
@@ -103,16 +110,24 @@ def _get_event_additional_info(event_url: str) -> dict:
 
     # Проверка стоимости мероприятия. Если не платное, 
     # то может быть как бесплатное, так и платное
+    is_free = None
     if soup.find("p", class_="price-info") is not None:
-        result["is_free"] = False
+        is_free = False
     else:
-        result["is_free"] = None
+        is_free = None
 
+    start_date = datetime.now()
+    end_date = datetime.now()
     if len(raw_dates) == 2:
-        result["start_date"] = datetime.strptime(raw_dates[0], "%d.%m.%Y")
-        result["end_date"] = datetime.strptime(raw_dates[1], "%d.%m.%Y")
+        start_date = datetime.strptime(raw_dates[0], "%d.%m.%Y")
+        end_date = datetime.strptime(raw_dates[1], "%d.%m.%Y")
     else:
-        result["start_date"] = datetime.strptime(raw_dates[0], "%d.%m.%Y")
-        result["end_date"] = datetime.strptime(raw_dates[0], "%d.%m.%Y")
+        start_date = datetime.strptime(raw_dates[0], "%d.%m.%Y")
+        end_date = datetime.strptime(raw_dates[0], "%d.%m.%Y")
 
-    return result
+    return _EventAdditionalInfo(description=description, 
+                                is_free=is_free, 
+                                address=address, 
+                                url=url,
+                                start_date=start_date, 
+                                end_date=end_date)

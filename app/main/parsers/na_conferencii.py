@@ -3,6 +3,7 @@ import locale
 import re
 import requests
 from bs4 import BeautifulSoup
+from bs4.element import Tag as BS4Tag
 from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
 from typing import TypedDict
@@ -14,7 +15,7 @@ class _EventAdditionalInfo(TypedDict):
     description: str
     is_free: bool | None
     event_tags: list[str]
-        
+
 
 # Категории мероприятий
 categories = {
@@ -43,7 +44,7 @@ keywords = {
 }
 
 
-def get_na_conferencii_events() -> list:
+def get_na_conferencii_events() -> list[Event]:
     """
     Возвращает конференции с сайта: 
     https://na-konferencii.ru/
@@ -68,80 +69,89 @@ def get_na_conferencii_events() -> list:
         page_raw_events = page.find_all("div", class_="notice-item")
 
         for page_raw_event in page_raw_events:
-            event = Event()
+
+            event = _get_event(page_raw_event)
             
-            event_date_block = page_raw_event \
-                .find("div", class_="notice-item-top-date") \
-                .find("p")
-            
-            event_raw_date = event_date_block.contents[0].strip(" \n")
-            event_raw_date_splitted = event_raw_date.split(" - ")
-            start_date_day = event_raw_date_splitted[0].split(" ")[0]
-            start_date_month = event_raw_date_splitted[0].split(" ")[1]
-            end_date_day = event_raw_date_splitted[1].split(" ")[0]
-            end_date_month = event_raw_date_splitted[1].split(" ")[1]
-            date_year = event_raw_date_splitted[1].split(" ")[2]
-
-            # Получаем данные для даты окончания регистрации
-            event_raw_registration_deadline = event_date_block \
-                .contents[len(event_date_block.contents)-1].strip(" \n")
-            raw_registration_shortened = \
-                event_raw_registration_deadline[
-                    event_raw_registration_deadline.index("по"):
-                ]
-            raw_registration_splitted = raw_registration_shortened.split(" ")
-            registration_day = raw_registration_splitted[1]
-            registration_month = raw_registration_splitted[2]
-            registration_year = raw_registration_splitted[3]
-
-            locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
-            event.start_date = datetime.strptime(f"{start_date_day} {start_date_month} {date_year}", "%d %B %Y")
-            event.end_date = datetime.strptime(f"{end_date_day} {end_date_month} {date_year}", "%d %B %Y")
-            event.registration_deadline = datetime.strptime(f"{registration_day} {registration_month} {registration_year}", "%d %B %Y")
-
-            # Устанавливаем московский часововой пояс
-            moscow_tz = timezone(timedelta(hours=3))
-            event.start_date = event.start_date.replace(tzinfo=moscow_tz)
-            event.end_date = event.end_date.replace(tzinfo=moscow_tz)      
-            event.registration_deadline = event.registration_deadline.replace(tzinfo=moscow_tz)      
-
-            event.title = page_raw_event \
-                .find("div", class_="notice-item-title").find("a").string
-            event.url =  page_raw_event \
-                .find("div", class_="notice-item-title").find("a").get("href")      
-            event.address = page_raw_event \
-                .find("div", class_="notice-item-top-location") \
-                .find("p").string
-
-            is_valid_event, event_additional_info = _get_event_additional_info(event.url)
-            if not is_valid_event:
-                continue
-
-            event.description = event_additional_info["description"]
-
-            # Добавляем теги к описанию
-            tags_div = page_raw_event.find("div", class_="notice-item-body-inner")
-            raw_tags = tags_div.find_all("a")
-            for raw_tag in raw_tags:
-                event.description += (". " + raw_tag.string)
-
-            event.type_of_event = EventTypeClissifier \
-                .objects.get(type_code=event_types["Конференция"])
-
-            event.is_free = event_additional_info["is_free"]
-
-            # Проверка на актуальность
-            if event.registration_deadline < datetime.now(tzlocal()).astimezone(moscow_tz):
-                continue
-
-            events.append(event)
+            if event is not None:
+                events.append(event)
 
     return events
 
 
-def _get_event_additional_info(event_url: str) -> tuple[bool, _EventAdditionalInfo]:
-    result = {}
+def _get_event(raw_event: BS4Tag) -> Event | None:
+    event = Event()
+    
+    event_date_block = raw_event \
+        .find("div", class_="notice-item-top-date") \
+        .find("p")
+    
+    event_raw_date = event_date_block.contents[0].strip(" \n")
+    event_raw_date_splitted = event_raw_date.split(" - ")
+    start_date_day = event_raw_date_splitted[0].split(" ")[0]
+    start_date_month = event_raw_date_splitted[0].split(" ")[1]
+    end_date_day = event_raw_date_splitted[1].split(" ")[0]
+    end_date_month = event_raw_date_splitted[1].split(" ")[1]
+    date_year = event_raw_date_splitted[1].split(" ")[2]
 
+    # Получаем данные для даты окончания регистрации
+    event_raw_registration_deadline = event_date_block \
+        .contents[len(event_date_block.contents)-1].strip(" \n")
+    raw_registration_shortened = \
+        event_raw_registration_deadline[
+            event_raw_registration_deadline.index("по"):
+        ]
+    raw_registration_splitted = raw_registration_shortened.split(" ")
+    registration_day = raw_registration_splitted[1]
+    registration_month = raw_registration_splitted[2]
+    registration_year = raw_registration_splitted[3]
+
+    locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
+    event.start_date = datetime\
+        .strptime(f"{start_date_day} {start_date_month} {date_year}", "%d %B %Y")
+    event.end_date = datetime\
+        .strptime(f"{end_date_day} {end_date_month} {date_year}", "%d %B %Y")
+    event.registration_deadline = datetime\
+        .strptime(f"{registration_day} {registration_month} {registration_year}", "%d %B %Y")
+
+    # Устанавливаем московский часововой пояс
+    moscow_tz = timezone(timedelta(hours=3))
+    event.start_date = event.start_date.replace(tzinfo=moscow_tz)
+    event.end_date = event.end_date.replace(tzinfo=moscow_tz)      
+    event.registration_deadline = event.registration_deadline.replace(tzinfo=moscow_tz)  
+    
+    # Проверка на актуальность
+    if event.registration_deadline < datetime.now(tzlocal()).astimezone(moscow_tz):
+        return None    
+
+    event.title = raw_event \
+        .find("div", class_="notice-item-title").find("a").string
+    event.url =  raw_event \
+        .find("div", class_="notice-item-title").find("a").get("href")      
+    event.address = raw_event \
+        .find("div", class_="notice-item-top-location") \
+        .find("p").string
+
+    is_valid_event, event_additional_info = _get_event_additional_info(event.url)
+    if not is_valid_event:
+        return None
+
+    event.description = event_additional_info["description"]
+
+    # Добавляем теги к описанию
+    tags_div = raw_event.find("div", class_="notice-item-body-inner")
+    raw_tags = tags_div.find_all("a")
+    for raw_tag in raw_tags:
+        event.description += (". " + raw_tag.string)
+
+    event.type_of_event = EventTypeClissifier \
+        .objects.get(type_code=event_types["Конференция"])
+
+    event.is_free = event_additional_info["is_free"]
+
+    return event
+
+
+def _get_event_additional_info(event_url: str) -> tuple[bool, _EventAdditionalInfo]:
     response = requests.get(event_url)
     html_decoded_string = html.unescape(response.text)
     page = BeautifulSoup(html_decoded_string, "html.parser")
@@ -178,19 +188,19 @@ def _get_event_additional_info(event_url: str) -> tuple[bool, _EventAdditionalIn
     # Вычисление стоимости конференции
     is_free = None
     for word in keywords["paid"]["words"]:
-        if word in result["description"].lower():
+        if word in description.lower():
             is_free = False
     
     for regex in keywords["paid"]["regex"]:
-        if re.search(regex, result["description"].lower()):
+        if re.search(regex, description.lower()):
             is_free = False
     
     for word in keywords["free"]["words"]:
-        if word in result["description"].lower():
+        if word in description.lower():
             is_free = True
     
     for regex in keywords["free"]["regex"]:
-        if re.search(regex, result["description"].lower()):
+        if re.search(regex, description.lower()):
             is_free = True
 
     return (is_valid_event, _EventAdditionalInfo(description=description, 

@@ -4,7 +4,7 @@ from datetime import datetime, timezone, timedelta
 from main.models import *
 
 
-def get_leaders_of_digital_events() -> list:
+def get_leaders_of_digital_events() -> list[Event]:
     """
     Возвращает список событий с сайта:
     https://leadersofdigital.ru
