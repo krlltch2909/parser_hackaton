@@ -146,7 +146,7 @@ async def accept_tag(query: types.CallbackQuery, state: FSMContext):
             data["current_page"]))
 
 
-def add_code(already_exists_codes: list, code: int) -> list:
+def add_code(already_exists_codes: list[int], code: int) -> list[int]:
     if type(already_exists_codes) is not list:
         already_exists_codes = []
 

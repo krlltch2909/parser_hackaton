@@ -1,4 +1,6 @@
-class EventTag:
-    def __init__(self, description: str, type_code: int) -> None:
-        self.description = description
-        self.type_code = type_code
+from pydantic import BaseModel, Field
+
+
+class EventTag(BaseModel):
+    type_code: int = Field(alias="tag_code")
+    description: str

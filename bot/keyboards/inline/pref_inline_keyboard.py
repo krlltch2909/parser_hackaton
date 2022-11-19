@@ -1,20 +1,20 @@
 import os
 from aiogram.utils.callback_data import CallbackData
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from typing import List, Union
 from models.EventTag import EventTag
 from models.EventType import EventType
 from utils.get_indexes import get_indexes
 from .utils import add_control_buttons
 
 
-PAGE_SIZE =  os.getenv("PREF_PAGE_SIZE")
+PAGE_SIZE = os.getenv("PREF_PAGE_SIZE")
+PAGE_SIZE = int(PAGE_SIZE) if PAGE_SIZE is not None else 3
 
 
-def generate_events_pref_inline_keyboard(code_objects: Union[List[EventType], List[EventTag]],
-                                  checked_codes: List[int],
-                                  type_data: CallbackData,
-                                  page: int) -> InlineKeyboardMarkup:
+def generate_events_pref_inline_keyboard(code_objects: list[EventType] | list[EventTag],
+                                         checked_codes: list[int],
+                                         type_data: CallbackData,
+                                         page: int) -> InlineKeyboardMarkup:
     start_index, end_index = get_indexes(code_objects, page, PAGE_SIZE)
     inline_keyboard = []
     for i in range(start_index, end_index + 1):

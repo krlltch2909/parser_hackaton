@@ -4,10 +4,12 @@ from datetime import timedelta
 from utils.database import sync_user_preferences_collection
 
 
-@timeloop.job(interval=timedelta(seconds=os.getenv("API_CRAWLING_INTERVAL")))
-def send_new_events() -> None:
-    users_preferences = sync_user_preferences_collection.find({})
-    count = sync_user_preferences_collection.count_documents({})
+ENV_SECONDS = os.getenv("API_CRAWLING_INTERVAL")
+ENV_SECONDS = float(ENV_SECONDS) if ENV_SECONDS is not None else 30
 
+
+@timeloop.job(interval=timedelta(seconds=ENV_SECONDS))
+def send_new_events():
+    users_preferences = sync_user_preferences_collection.find({})
     for user_preferences in users_preferences:
-        pass        
+        print(user_preferences["_id"])

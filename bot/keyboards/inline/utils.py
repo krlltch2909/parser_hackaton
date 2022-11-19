@@ -1,10 +1,9 @@
-from typing import List
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 
 
-def add_control_buttons(inline_keyboard: List[InlineKeyboardButton], 
-                        objects: List, 
+def add_control_buttons(inline_keyboard: list[list[InlineKeyboardButton]], 
+                        objects: list, 
                         data: CallbackData, 
                         data_params: dict,
                         start_index: int, 

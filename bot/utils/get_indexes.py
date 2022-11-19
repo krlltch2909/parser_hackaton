@@ -1,7 +1,4 @@
-from typing import Tuple
-
-
-def get_indexes(objects: list, current_page: int, page_size: int) -> Tuple[int, int]:
+def get_indexes(objects: list, current_page: int, page_size: int) -> tuple[int, int]:
     """
     Возвращает начальный и конечный индекс для итерации по списку
     с учетом размера выборки
