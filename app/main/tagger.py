@@ -95,7 +95,7 @@ def update_all_v2(path: str, events: QuerySet, word_counter: int = 5):
             if counter > word_counter:
                 tag_for_event = Tag.objects.filter(description=key)
                 event.tags.add(tag_for_event[0])
-                #                event.save()
+                event.save()
                 count_of_tegged_events += 1
                 print(event, event.tags.all(), sep=" | ")
     print(count_of_tegged_events)

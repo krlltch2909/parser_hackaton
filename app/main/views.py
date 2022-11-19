@@ -4,6 +4,7 @@ from .models import Event, Tag, EventTypeClissifier
 from .serializer import EventSerializer, TagSerializer, EventTypeSerializer
 from django.db.models.query import QuerySet
 
+
 def filter_by_type(types: list, events_for_filtering: QuerySet) -> QuerySet:
     """
     метод для фильтрации мероприятий по типу (конференция, хакатон, итд)
@@ -41,7 +42,6 @@ def filter_by_tag(tags: list, events_for_filtering: QuerySet) -> QuerySet:
 class TypeTitleAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, ]
     serializer_class = EventSerializer
-    
 
     def get_queryset(self):
         """
