@@ -11,8 +11,7 @@ from .parsers.leader_id import get_leader_id_events
 from .parsers.leaders_of_digital import get_leaders_of_digital_events
 from .parsers.na_conferencii import get_na_conferencii_events
 from .parsers.university_2035 import get_2035_university_events
-from .tagger import all_events_tagger, conference_tagger
-
+from .tagger import all_events_tagger
 
 @shared_task
 def clean_data_base() -> None:
