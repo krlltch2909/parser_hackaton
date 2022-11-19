@@ -1,7 +1,6 @@
 import os
 import sys
 import time
-from timeloop import Timeloop
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from dotenv import load_dotenv
@@ -23,7 +22,6 @@ admins = []
 if ADMINS_IDS is not None:    
     admins = ADMINS_IDS.split(",")
     admins = [admin for admin in admins if admin != ""]
-timeloop = Timeloop()
 
 django_start = False
 

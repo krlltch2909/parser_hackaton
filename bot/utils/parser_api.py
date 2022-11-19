@@ -1,5 +1,6 @@
 import aiohttp
 import os
+import requests
 import sys
 from loader import token
 from models.EventType import EventType
@@ -67,3 +68,18 @@ async def get_tags() -> list[EventTag]:
             for raw_tag in data:
                 tags.append(EventTag.parse_obj(raw_tag))
             return tags
+
+async def get_updates() -> list[Event]:
+    """
+    Функция для получения новых мероприятий.
+    Используется для рассылки
+    """
+    url = API_BASE_URL + "hackaton/updates"
+    
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url=url, headers=_headers) as response:
+            data = await response.json(content_type=None)        
+            events = []
+            for raw_event in data:
+                events.append(Event.parse_obj(raw_event))
+            return events
