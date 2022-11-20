@@ -79,8 +79,8 @@ def parse_new_events() -> None:
 
         except Exception as e:
             print("error in saving " + str(e))
-    all_events_tagger()
-    conference_tagger()
+    # all_events_tagger()
+    # conference_tagger()
 
 
     print('ended')

@@ -20,7 +20,7 @@ COPY . .
 
 COPY supervisor/supervisord.conf /etc/supervisor/supervisord.conf
 COPY supervisor/myproject.conf /etc/supervisor/conf.d/myproject.conf
-RUN chmod +x runscript.sh
+RUN chmod +x supervisor/start_commands/
 
 ENV LANG ru_RU.UTF-8
 ENV LC_ALL ru_RU.UTF-8
