@@ -7,7 +7,7 @@ from .admin import send_to_admin
 
 async def on_start(dp):
     # Запускаем периодическую задачу для проверки новых мероприятий
-    asyncio.create_task(send_new_events())
+    # asyncio.create_task(send_new_events())
     await bot.set_my_commands(
         commands=[
             BotCommand("events", "Открыть меню мероприятий"),

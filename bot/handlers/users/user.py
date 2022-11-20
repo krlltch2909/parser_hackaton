@@ -65,16 +65,21 @@ async def get_all_events(message: types.Message, state: FSMContext):
     result_message = ""
     data = await state.get_data()
     page_size = int(data.get("page_size"))
-    for raw_event in data.get("events")[:page_size]:
-        result_message += create_event_messsage(raw_event)
-        result_message += "---------------------------\n\n"
-    await bot.send_message(message.from_user.id,
-                           result_message,
-                           parse_mode="HTML",
-                           disable_web_page_preview=True,
-                           reply_markup=get_events_list_keyboard(data.get("current_page"),
-                                                                 page_size,
-                                                                 data.get("events")))
+    
+    if len(events) == 0:
+        result_message = "Не удалось найти мероприятия"
+        await bot.send_message(message.from_user.id, result_message)
+    else:
+        for raw_event in data.get("events")[:page_size]:
+            result_message += create_event_messsage(raw_event)
+            result_message += "---------------------------\n\n"
+        await bot.send_message(message.from_user.id,
+                            result_message,
+                            parse_mode="HTML",
+                            disable_web_page_preview=True,
+                            reply_markup=get_events_list_keyboard(data.get("current_page"),
+                                                                  page_size,
+                                                                  data.get("events")))
 
 
 @dp.callback_query_handler(text_contains="event_list")

@@ -62,9 +62,6 @@ async def accept_event_type(query: types.CallbackQuery, state: FSMContext):
         await PreferencesStatesGroup.events_types.set()
     elif button_type == "done":
         async with state.proxy() as data:
-            events_types = add_code(data["events_types"], type_code)
-            data["events_types"] = events_types
-
             # Сброс номера страницы для следующего выбора
             data["current_page"] = 1
             chat_id = query.from_user.id
@@ -109,8 +106,7 @@ async def accept_tag(query: types.CallbackQuery, state: FSMContext):
         await PreferencesStatesGroup.tags.set()
     elif button_type == "done":
         async with state.proxy() as data:
-            tags = add_code(data["tags"], tag_code)
-            data["tags"] = tags
+            tags = data.get("tags")
             events_types = data["events_types"]
             user_id = query.from_user.id
             creation_data = {

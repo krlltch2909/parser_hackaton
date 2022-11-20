@@ -1,6 +1,5 @@
 import aiohttp
 import os
-import requests
 import sys
 from loader import token
 from models.EventType import EventType
@@ -21,7 +20,7 @@ async def get_events_types() -> list[EventType]:
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url=url, headers=_headers) as response:
-            data = await response.json(content_type=None)
+            data = await response.json(content_type="application/json")
             events_types = []
             for raw_event_type in data:
                 events_types.append(EventType.parse_obj(raw_event_type))
@@ -33,7 +32,7 @@ async def get_events() -> list[Event]:
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url=url, headers=_headers) as response:
-            data = await response.json(content_type=None)
+            data = await response.json(content_type="application/json")
             events = []
             for raw_event in data:
                 events.append(Event.parse_obj(raw_event))
@@ -48,14 +47,14 @@ async def get_events_by_preferences(events_types: list[int], tags: list[int]) ->
 
     for tag in tags:
         url += f"tags={tag}&"
-
+    
     async with aiohttp.ClientSession() as session:
         async with session.get(url=url, headers=_headers) as response:
-            data = await response.json(content_type=None)
+            data = await response.json(content_type="application/json")
             events = []
             for raw_event in data:
                 events.append(Event.parse_obj(raw_event))
-            return data
+            return events
 
 
 async def get_tags() -> list[EventTag]:
@@ -63,7 +62,7 @@ async def get_tags() -> list[EventTag]:
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url=url, headers=_headers) as response:
-            data = await response.json(content_type=None)
+            data = await response.json(content_type="application/json")
             tags = []
             for raw_tag in data:
                 tags.append(EventTag.parse_obj(raw_tag))
