@@ -8,8 +8,8 @@ class EventTypeClissifier(models.Model):
     """
     классификатор типов события
     """
-    type_code = models.SmallAutoField(primary_key=True, verbose_name="type_code")
-    description = models.CharField(max_length=255, unique=True)
+    type_code = models.SmallIntegerField(primary_key=True)
+    description = models.CharField(max_length=255)
 
     def __str__(self):
         return self.description
@@ -19,18 +19,29 @@ class Tag(models.Model):
     """
     классификатор тегов
     """
-    tag_code = models.SmallAutoField(primary_key=True)
-    description = models.CharField(max_length=255, unique=True)
+    tag_code = models.SmallIntegerField(primary_key=True)
+    description = models.CharField(max_length=255)
 
     def __str__(self):
         return self.description
+
+
+class HistoryUserRequest(models.Model):
+    """
+    модель для записей о времяни обращения конкретного пользователя к серверу
+    """
+
+    user_id = models.IntegerField(primary_key=True)
+    time_of_last_request = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user_id
 
 
 class Event(models.Model):
     """
     модель всех событий
     """
-    id = models.BigAutoField(primary_key=True)
     title = models.CharField(max_length=255)
     description = models.TextField()
 
@@ -47,6 +58,8 @@ class Event(models.Model):
     is_free = models.BooleanField(blank=True, null=True)
 
     tags = models.ManyToManyField(Tag, blank=True)
+
+    date_of_parsing = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title

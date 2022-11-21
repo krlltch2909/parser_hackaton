@@ -50,9 +50,6 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'main',
 
-     # 'corsheaders',
-
-
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
@@ -61,8 +58,6 @@ INSTALLED_APPS = [
 # SITE_ID = 0
 
 MIDDLEWARE = [
-     # 'corsheaders.middleware.CorsMiddleware',
-
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -74,14 +69,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'app.urls'
 
-
-# это для js я просто это изучаю, потом снесу
-#  pip uninstall django-cors-headers
-# del   'corsheaders', and  'corsheaders.middleware.CorsMiddleware',
-# CORS_ORIGIN_ALLOW_ALL = False
-# CORS_ORIGIN_WHITELIST = (
-#    'http://localhost:8080',
-# )
 
 TEMPLATES = [
     {
@@ -155,7 +142,6 @@ TIME_ZONE = 'Europe/Moscow'  # 'Europe/Moscow'
 # USE_I18N = True
 #
 USE_TZ = True
-
 
 
 # Static files (CSS, JavaScript, Images)

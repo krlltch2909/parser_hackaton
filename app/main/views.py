@@ -1,6 +1,8 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .models import Event, Tag, EventTypeClissifier
+from rest_framework.authtoken.models import Token
+from .models import Event, Tag, EventTypeClissifier, HistoryUserRequest
 from .serializer import EventSerializer, TagSerializer, EventTypeSerializer
 from django.db.models.query import QuerySet
 
@@ -65,6 +67,28 @@ class TypeTitleAPIView(generics.ListAPIView):
         if len(type_of_event_get) == 0 and len(tags) == 0:
             rez = all_events
         return rez.order_by('start_date')
+
+
+class HackatonUpdateAPIView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = EventSerializer
+
+    def get_queryset(self):
+        token = self.request.auth
+
+        user = Token.objects.get(key=token).user
+
+        try:
+            current_user_history = HistoryUserRequest.objects.get(user_id=user.id)
+        except ObjectDoesNotExist:
+            current_user_history = HistoryUserRequest.objects.create(user_id=user.id)
+
+        print(current_user_history.time_of_last_request)
+
+        result_queryset = Event.objects.filter(date_of_parsing__gte=current_user_history.time_of_last_request)
+        current_user_history.save()
+
+        return result_queryset
 
 
 class TagAPIView(generics.ListAPIView):
