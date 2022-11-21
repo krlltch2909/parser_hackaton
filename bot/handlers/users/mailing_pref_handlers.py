@@ -34,7 +34,7 @@ async def get_mailing_type(query: types.CallbackQuery, state: FSMContext):
 async def get_mailing_status(query: types.CallbackQuery, state: FSMContext):
     query_data = query.data.split(":")
     data = await state.get_data()
-    mailing_type = data.get("mailing_type")
+    mailing_type = data["mailing_type"]
     mailing_status = bool(query_data[1])
     user_id = query.from_user.id
 

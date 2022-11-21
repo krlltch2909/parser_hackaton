@@ -47,16 +47,16 @@ async def accept_event_type(query: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
 
     if button_type == "back":
-        new_page = data.get("current_page") - 1
+        new_page = data["current_page"] - 1
         await query.message.\
-            edit_reply_markup(await generate_events_types_markup(data.get("events_types"),
+            edit_reply_markup(await generate_events_types_markup(data["events_types"],
                                                                  new_page))
         await state.update_data(current_page=new_page)
         await PreferencesStatesGroup.events_types.set()
     elif button_type == "next":
-        new_page = data.get("current_page") + 1
+        new_page = data["current_page"] + 1
         await query.message.\
-            edit_reply_markup(await generate_events_types_markup(data.get("events_types"),
+            edit_reply_markup(await generate_events_types_markup(data["events_types"],
                                                                  new_page))
         await state.update_data(current_page=new_page)
         await PreferencesStatesGroup.events_types.set()
@@ -93,20 +93,20 @@ async def accept_tag(query: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
 
     if button_type == "back":
-        new_page = data.get("current_page") - 1
-        await query.message.edit_reply_markup(await generate_tags_markup(data.get("tags"),
-            new_page))
+        new_page = data["current_page"] - 1
+        await query.message.edit_reply_markup(await generate_tags_markup(data["tags"],
+                                                                         new_page))
         await state.update_data(current_page=new_page)
         await PreferencesStatesGroup.tags.set()
     elif button_type == "next":
-        new_page = data.get("current_page") + 1
-        await query.message.edit_reply_markup(await generate_tags_markup(data.get("tags"),
-            new_page))
+        new_page = data["current_page"] + 1
+        await query.message.edit_reply_markup(await generate_tags_markup(data["tags"],
+                                                                         new_page))
         await state.update_data(current_page=new_page)
         await PreferencesStatesGroup.tags.set()
     elif button_type == "done":
         async with state.proxy() as data:
-            tags = data.get("tags")
+            tags = data["tags"]
             events_types = data["events_types"]
             user_id = query.from_user.id
             creation_data = {

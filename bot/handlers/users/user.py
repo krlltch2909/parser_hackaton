@@ -64,22 +64,22 @@ async def get_all_events(message: types.Message, state: FSMContext):
     await message.delete()
     result_message = ""
     data = await state.get_data()
-    page_size = int(data.get("page_size"))
+    page_size = int(data["page_size"])
     
     if len(events) == 0:
         result_message = "Не удалось найти мероприятия"
         await bot.send_message(message.from_user.id, result_message)
     else:
-        for raw_event in data.get("events")[:page_size]:
+        for raw_event in data["events"][:page_size]:
             result_message += create_event_messsage(raw_event)
             result_message += "---------------------------\n\n"
         await bot.send_message(message.from_user.id,
                             result_message,
                             parse_mode="HTML",
                             disable_web_page_preview=True,
-                            reply_markup=get_events_list_keyboard(data.get("current_page"),
+                            reply_markup=get_events_list_keyboard(data["current_page"],
                                                                   page_size,
-                                                                  data.get("events")))
+                                                                  data["events"]))
 
 
 @dp.callback_query_handler(text_contains="event_list")
@@ -94,13 +94,13 @@ async def get_event_page(query: types.CallbackQuery, state: FSMContext):
 
     data = await state.get_data()
     if button_type == "next":
-        await state.update_data(current_page=data.get("current_page") + 1)
+        await state.update_data(current_page=data["current_page"] + 1)
     elif button_type == "back":
-        await state.update_data(current_page=data.get("current_page") - 1)
+        await state.update_data(current_page=data["current_page"] - 1)
     data = await state.get_data()
-    events = data.get("events")
-    current_page = data.get("current_page")
-    page_size = data.get("page_size")
+    events = data["events"]
+    current_page = data["current_page"]
+    page_size = data["page_size"]
     start_index, end_index = get_indexes(events, current_page, page_size)
     new_message_text = ""
 

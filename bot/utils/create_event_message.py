@@ -9,7 +9,7 @@ def create_event_messsage(event: Event) -> str:
         message += f"<i>Место проведения:</i> {event.address}\n\n"
     if event.start_date is not None and event.end_date is not None:
         start_datetime = datetime.fromisoformat(event.start_date)
-        end_datetime = datetime.fromisoformat(event.start_date)
+        end_datetime = datetime.fromisoformat(event.end_date)
         message += (f"<i>Даты проведения:</i> {start_datetime.strftime('%d.%m.%Y')}" \
             f" - {end_datetime.strftime('%d.%m.%Y')}" + "\n\n")
     if event.registration_deadline is not None:
