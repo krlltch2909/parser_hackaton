@@ -19,17 +19,27 @@ async def send_new_events():
             if "mailing_status" in user_preferences and user_preferences["mailing_status"]:             
                 for new_event in new_events:  
                     event_message = create_event_messsage(new_event)
-                    event_message = "<b>Новое мероприятие!</b>" + event_message
+                    event_message = "<b>Новое мероприятие!</b>\n" + event_message
                     need_to_send = False
                     try:
                         if user_preferences["mailing_type"] == "all":
                             need_to_send = True
                         else:
-                            event_type_code = new_event.type_of_event.type_code
-                            event_tags_codes = map(lambda x: x.type_code, new_event.tags)
-                            if event_type_code in user_preferences["events_types"] \
-                                or any(item in user_preferences["tags"] for item in event_tags_codes):
+                            user_events_codes = user_preferences["events_types"]
+                            user_tags_codes = user_preferences["tags"]
+                            event_code = new_event.type_of_event.type_code
+                            tags_codes = map(lambda x: x.type_code, new_event.tags)
+                            matched_by_tag = \
+                                any(item in user_tags_codes for item in tags_codes)
+                            matched_by_event_code = event_code in user_events_codes
+                            
+                            if len(user_events_codes) != 0 and len(user_tags_codes) != 0 and \
+                                matched_by_tag and matched_by_event_code:
                                     need_to_send = True
+                            elif len(user_events_codes) != 0 and matched_by_event_code:
+                                need_to_send = True
+                            elif len(user_tags_codes) != 0 and matched_by_tag:
+                                need_to_send = True
                         if need_to_send:
                             await bot.send_message(id, 
                                                    event_message, 

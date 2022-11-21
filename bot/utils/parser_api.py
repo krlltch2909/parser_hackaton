@@ -73,7 +73,7 @@ async def get_updates() -> list[Event]:
     Функция для получения новых мероприятий.
     Используется для рассылки
     """
-    url = API_BASE_URL + "hackaton/updates"
+    url = API_BASE_URL + "hackaton/update/"
     
     async with aiohttp.ClientSession() as session:
         async with session.get(url=url, headers=_headers) as response:
