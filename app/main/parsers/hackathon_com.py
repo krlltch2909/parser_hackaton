@@ -39,7 +39,7 @@ def get_hackathon_com_events() -> list[Event]:
         event.url = raw_event["url"]
         event.img = raw_event["image"]
 
-        event.type_of_event = EventTypeClissifier.objects.get(type_code=2)  # Хакатон
+        event.type_of_event = EventTypeClissifier.objects.get(description="Хакатон")
         event.is_free = True
         events.append(event)
     

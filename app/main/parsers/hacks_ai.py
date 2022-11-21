@@ -81,11 +81,11 @@ def _fill_event(event: Event, event_id: int, event_type: str) -> bool:
     if event_type == HACKATHONS:
         event.title = f"'Цифровой прорыв'. Хакатон ({event.address})"
 
-        event.type_of_event = EventTypeClissifier.objects.get(type_code=2) # Хакатон
+        event.type_of_event = EventTypeClissifier.objects.get(description="Хакатон") # Хакатон
     else:
         event.title = f"'Цифровой прорыв'. Чемпионат ({event.address})"
 
-        event.type_of_event = EventTypeClissifier.objects.get(type_code=3) # Соревнование
+        event.type_of_event = EventTypeClissifier.objects.get(description="Соревнование") # Соревнование
 
     event.is_free = True
     return True

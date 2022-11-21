@@ -18,10 +18,12 @@ class _EventAdditionalInfo(TypedDict):
 
 
 # Категории мероприятий
-categories = {
-    "Информационные технологии": 106,
-    "Биотехнологии": 107,
-}
+categories = [
+    "Информационные технологии",
+    "Биотехнологии",
+    "Технологии",
+    "Технические науки (Разное)"
+]
 
 # Категории вхождения в наукометрические базы
 ref_categories = {
@@ -171,7 +173,7 @@ def _get_event_additional_info(event_url: str) -> tuple[bool, _EventAdditionalIn
     tags = [raw_tag.string for raw_tag in raw_tags]
     
     is_valid_event = False
-    for category_name in categories.keys():
+    for category_name in categories:
         if category_name in tags:
             is_valid_event = True
 
