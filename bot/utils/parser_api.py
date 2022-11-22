@@ -68,6 +68,7 @@ async def get_tags() -> list[EventTag]:
                 tags.append(EventTag.parse_obj(raw_tag))
             return tags
 
+
 async def get_updates() -> list[Event]:
     """
     Функция для получения новых мероприятий.

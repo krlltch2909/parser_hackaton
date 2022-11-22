@@ -11,3 +11,11 @@ for event_type in EventTypeClissifier.objects.all():
 tag_types: dict[str, int] = {}
 for tag_type in Tag.objects.all():
     tag_types[tag_type.description] = tag_type.tag_code
+
+
+def clean_event(event: Event) -> None:
+    event.title = re.sub(CLEANER, "", event.title)
+    event.description = re.sub(CLEANER, "", event.description)
+    
+    if event.address is not None:
+        event.address = re.sub(CLEANER, "", event.address)

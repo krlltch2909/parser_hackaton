@@ -29,7 +29,7 @@ async def start_pref_setting(message: types.Message, state: FSMContext):
     data = await state.get_data()
     await message.answer("Выберите интересующие вас виды мероприятий:",
                          reply_markup=await generate_events_types_markup(data["events_types"], 
-                                                                          data["current_page"]))
+                                                                         data["current_page"]))
 
     # Перенаправляем на хендлер-обработчик ответа
     await PreferencesStatesGroup.events_types.set()

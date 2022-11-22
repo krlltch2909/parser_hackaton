@@ -2,6 +2,7 @@ from datetime import datetime
 from celery import shared_task
 from dateutil.relativedelta import relativedelta
 
+from .parsers.utils import clean_event
 from .models import Event
 from .parsers.all_events import get_all_events
 from .parsers.hackathon_com import get_hackathon_com_events
@@ -12,6 +13,7 @@ from .parsers.leaders_of_digital import get_leaders_of_digital_events
 from .parsers.na_conferencii import get_na_conferencii_events
 from .parsers.university_2035 import get_2035_university_events
 from .tagger import all_events_tagger
+
 
 @shared_task
 def clean_data_base() -> None:
@@ -61,7 +63,11 @@ def parse_new_events() -> None:
         except Exception as e:
             print("error " + str(e))
             print(e.args)
-
+            
+    # Очистка свойств мероприятий от тегов
+    for event in return_rez:
+        clean_event(event)
+        
     time_end = datetime.now() - time_start
     print(time_end)
     print(len(return_rez))
@@ -73,14 +79,8 @@ def parse_new_events() -> None:
 
             if len(find_same_event) == 0:
                 event.save()
-            # else:
-            #     for i in find_same_event:
-            #         print(f"bd event {i.title} | found new event {event.title}")
 
         except Exception as e:
             print("error in saving " + str(e))
     all_events_tagger()
-    # conference_tagger()
-
-
     print('ended')

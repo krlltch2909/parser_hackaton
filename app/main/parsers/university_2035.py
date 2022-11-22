@@ -51,12 +51,12 @@ def get_2035_university_events() -> list[Event]:
         response = requests.get(page_url)
         html_decoded_string = html.unescape(response.text)
         page = BeautifulSoup(html_decoded_string, "html.parser")
-        page_raw_events = page.find_all("div", class_="accelerator-item") 
+        page_raw_events = page.find_all("a", class_="accelerator-item") 
 
         for page_raw_event in page_raw_events:
             event = Event()
             event.title = page_raw_event.find("h4").string
-            event.url = base_url + page_raw_event.find("h4").parent.get("href")
+            event.url = base_url + page_raw_event.get("href")
             event.img = page_raw_event.find("img").get("src")
             event_additional_info = _get_event_additional_info(event.url)
             

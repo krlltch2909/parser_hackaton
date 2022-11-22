@@ -9,7 +9,7 @@ def add_control_buttons(inline_keyboard: list[list[InlineKeyboardButton]],
                         start_index: int, 
                         page_size: int) -> None:
     
-    if (start_index + page_size - 1 <= len(objects) - 1) and (start_index > 0):
+    if (start_index + page_size < len(objects) - 1) and (start_index > 0):
         inline_keyboard.append([
             InlineKeyboardButton(text="<<", 
                 callback_data=data.new(**data_params, button_type="back")),

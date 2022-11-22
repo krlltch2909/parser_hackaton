@@ -16,7 +16,7 @@ async def send_new_events():
         new_events = await get_updates()
         async for user_preferences in user_preferences_collection.find({}):
             id = user_preferences["_id"]
-            if "mailing_status" in user_preferences and user_preferences["mailing_status"]:             
+            if "mailing_status" in user_preferences and user_preferences["mailing_status"]:   
                 for new_event in new_events:  
                     event_message = create_event_messsage(new_event)
                     event_message = "<b>Новое мероприятие!</b>\n" + event_message

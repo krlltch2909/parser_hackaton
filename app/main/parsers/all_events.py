@@ -21,7 +21,6 @@ def get_all_events() -> list[Event]:
     first_page = BeautifulSoup(html_decoded_string, "html.parser")
     navigation_pages = first_page.find(name="div", attrs={"class": "navigation-pages"})\
         .find_all(name="a")
-    print(navigation_pages)
     raw_pages = [first_page]
     for navigation_page in navigation_pages:
         page_address = f"{url}?PAGEN_1={navigation_page.string}"
