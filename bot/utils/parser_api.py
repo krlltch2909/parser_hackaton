@@ -78,7 +78,7 @@ async def get_updates() -> list[Event]:
     
     async with aiohttp.ClientSession() as session:
         async with session.get(url=url, headers=_headers) as response:
-            data = await response.json(content_type=None)        
+            data = await response.json(content_type="application/json")        
             events = []
             for raw_event in data:
                 events.append(Event.parse_obj(raw_event))
