@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
 from main.models import *
-from .utils import event_types, CLEANER
+from .utils import get_event_types, CLEANER
 
 
 def get_all_events() -> list[Event]:
@@ -13,6 +13,7 @@ def get_all_events() -> list[Event]:
     Возвращает список различных событий с сайта:
     'https://all-events.ru/events/'
     """
+    event_types = get_event_types()
     events = []
     
     url = "https://all-events.ru/events/calendar/theme-is-upravlenie_personalom_hr-or-informatsionnye_tekhnologii-or-automotive_industry-or-bezopasnost-or-blokcheyn_kriptovalyuty-or-innovatsii-or-it_telecommunications-or-elektronnaya_kommertsiya/type-is-conferencia-or-hackathon-or-contest/"

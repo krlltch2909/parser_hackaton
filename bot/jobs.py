@@ -32,9 +32,8 @@ async def send_new_events():
                             matched_by_tag = \
                                 any(item in user_tags_codes for item in tags_codes)
                             matched_by_event_code = event_code in user_events_codes
-                            
-                            if len(user_events_codes) != 0 and len(user_tags_codes) != 0 and \
-                                matched_by_tag and matched_by_event_code:
+                            if len(user_events_codes) != 0 and len(user_tags_codes) != 0:
+                                if matched_by_tag and matched_by_event_code:
                                     need_to_send = True
                             elif len(user_events_codes) != 0 and matched_by_event_code:
                                 need_to_send = True

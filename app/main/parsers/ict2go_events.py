@@ -5,7 +5,7 @@ from typing import TypedDict
 from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
 from main.models import *
-from .utils import event_types
+from .utils import get_event_types
 
 
 class _EventAdditionalInfo(TypedDict):
@@ -34,6 +34,7 @@ def get_ict2go_events() -> list[Event]:
 
     raw_events = raw_event_list_filtered.find_all("div", class_="index-events-item")
 
+    event_types = get_event_types()
     events = []
     for raw_event in raw_events:
         event = Event()

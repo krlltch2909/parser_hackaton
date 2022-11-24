@@ -2,6 +2,7 @@ import requests
 from dateutil.tz import tzlocal
 from datetime import datetime, timedelta, timezone, timedelta
 from main.models import *
+from .utils import get_event_types
 
 
 HACKATHONS = "hackathons"
@@ -47,6 +48,7 @@ def _get_event_info(event_id: int, event_type) -> dict:
 
 
 def _fill_event(event: Event, event_id: int, event_type: str) -> bool:
+    event_types = get_event_types()
     event_info = _get_event_info(event_id, event_type)
 
     if "registrationDeadline" not in event_info.keys():
@@ -77,15 +79,22 @@ def _fill_event(event: Event, event_id: int, event_type: str) -> bool:
 
     if not _check_availability(event.url):
         return False
+    
 
     if event_type == HACKATHONS:
         event.title = f"'Цифровой прорыв'. Хакатон ({event.address})"
+        
+        if "Хакатон" not in event_types.keys():
+            return False
 
-        event.type_of_event = EventTypeClissifier.objects.get(description="Хакатон") # Хакатон
+        event.type_of_event = EventTypeClissifier.objects.get(description="Хакатон")
     else:
         event.title = f"'Цифровой прорыв'. Чемпионат ({event.address})"
+        
+        if "Соревнование" not in event_types.keys():
+            return False
 
-        event.type_of_event = EventTypeClissifier.objects.get(description="Соревнование") # Соревнование
+        event.type_of_event = EventTypeClissifier.objects.get(description="Соревнование")
 
     event.is_free = True
     return True

@@ -8,7 +8,7 @@ from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
 from typing import TypedDict
 from main.models import *
-from .utils import event_types, tag_types
+from .utils import get_event_types, get_tag_types
 
 
 class _EventAdditionalInfo(TypedDict):
@@ -81,6 +81,7 @@ def get_na_conferencii_events() -> list[Event]:
 
 
 def _get_event(raw_event: BS4Tag) -> Event | None:
+    event_types = get_event_types()
     event = Event()
     
     event_date_block = raw_event \
@@ -144,6 +145,9 @@ def _get_event(raw_event: BS4Tag) -> Event | None:
     raw_tags = tags_div.find_all("a")
     for raw_tag in raw_tags:
         event.description += (". " + raw_tag.string)
+        
+    if "Конференция" not in event_types.keys():
+        return None
 
     event.type_of_event = EventTypeClissifier \
         .objects.get(type_code=event_types["Конференция"])
@@ -154,6 +158,8 @@ def _get_event(raw_event: BS4Tag) -> Event | None:
 
 
 def _get_event_additional_info(event_url: str) -> tuple[bool, _EventAdditionalInfo]:
+    tag_types = get_tag_types()
+    
     response = requests.get(event_url)
     html_decoded_string = html.unescape(response.text)
     page = BeautifulSoup(html_decoded_string, "html.parser")

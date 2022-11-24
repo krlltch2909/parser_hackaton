@@ -4,7 +4,7 @@ import requests
 from dateutil.tz import tzlocal
 from datetime import datetime, timedelta, timezone, timedelta
 from main.models import *
-from .utils import CLEANER
+from .utils import CLEANER, get_event_types
 
 
 def get_hackathon_com_events() -> list[Event]:
@@ -16,7 +16,12 @@ def get_hackathon_com_events() -> list[Event]:
     response = requests.get(f"https://feeds.tildacdn.com/api/getfeed/?feeduid={feeduid}&feedtz=Europe/Moscow")
     data = response.json()
 
+    event_types = get_event_types()
     events = []
+    
+    if "Хакатон" not in event_types.keys():
+        return events
+    
     for raw_event in data["posts"]:
         event = Event()
         event.title = raw_event["title"]

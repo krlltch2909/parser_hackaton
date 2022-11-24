@@ -2,6 +2,7 @@ import requests
 from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
 from main.models import *
+from .utils import get_event_types
 
 
 def get_leaders_of_digital_events() -> list[Event]:
@@ -12,6 +13,7 @@ def get_leaders_of_digital_events() -> list[Event]:
     response = requests.get("https://leadersofdigital.ru/api/v1/site_get_all/0")
     data = response.json()
     raw_events = data["event"]
+    event_types = get_event_types()
     events = []
 
     for raw_event in raw_events:
@@ -34,7 +36,11 @@ def get_leaders_of_digital_events() -> list[Event]:
 
         event.url = f'https://leadersofdigital.ru/event/{raw_event["event_id"]}'
         event.img = raw_event["avatar_big_url"]
-        event.type_of_event = EventTypeClissifier.objects.get(description="Соревнование") # Хакатон
+        
+        if "Соревнование" not in event_types.keys():
+            continue
+        
+        event.type_of_event = EventTypeClissifier.objects.get(description="Соревнование")
         event.is_free = True
         events.append(event)
 

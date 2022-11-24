@@ -3,7 +3,7 @@ import re
 import requests
 from datetime import datetime, timezone, timedelta
 from main.models import *
-from .utils import event_types, CLEANER
+from .utils import get_event_types, CLEANER
 
 
 _themeIds = [
@@ -36,7 +36,7 @@ def get_leader_id_events() -> list[Event]:
             break
         response = requests.get(url + f"&paginationPage={i}")
         data = response.json()
-
+    
     events = []
     for raw_event in raw_events:
         event = _get_event(raw_event)
@@ -52,6 +52,7 @@ def _get_event(raw_event: dict) -> Event | None:
     Создает объект Event на основании переданного словаря с данными.
     Если данные не удовлетворяют требованиям, то возвращается None
     """
+    event_types = get_event_types()
     event = Event()
 
     if raw_event["timezone"] is None:

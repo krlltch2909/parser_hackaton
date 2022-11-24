@@ -6,7 +6,7 @@ from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
 from typing import TypedDict
 from main.models import *
-from .utils import CLEANER, event_types
+from .utils import CLEANER, get_event_types
 
 
 class _EventAdditionalInfo(TypedDict):
@@ -46,7 +46,12 @@ def get_2035_university_events() -> list[Event]:
     ])
     pages_urls = list(map(lambda x: base_url + x, pages_additional_urls))
 
+    event_types = get_event_types()
     events = []
+    
+    if "Акселератор" not in event_types.keys():
+        return events
+    
     for page_url in pages_urls:
         response = requests.get(page_url)
         html_decoded_string = html.unescape(response.text)
@@ -71,7 +76,7 @@ def get_2035_university_events() -> list[Event]:
             moscow_tz = timezone(timedelta(hours=3))
             event.start_date = event.start_date.replace(tzinfo=moscow_tz)
             event.end_date = event.end_date.replace(tzinfo=moscow_tz)
-
+            
             event.type_of_event = EventTypeClissifier \
                 .objects.get(type_code=event_types["Акселератор"])
             
