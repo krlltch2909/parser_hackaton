@@ -1,6 +1,5 @@
 from django.db import models
 
-
 # Create your models here.
 
 
@@ -33,9 +32,21 @@ class Tag(models.Model):
     """
     tag_code = models.SmallAutoField(primary_key=True)
     description = models.CharField(max_length=255, unique=True)
-
+        
     def __str__(self):
         return self.description
+    
+
+class Keyword(models.Model):
+    """
+    ключевое слово для тега
+    """
+    keyword_code = models.BigAutoField(primary_key=True)
+    content = models.CharField(max_length=255)
+    tag_code = models.ForeignKey(Tag, on_delete=models.DO_NOTHING)
+    
+    def __str__(self) -> str:
+        return self.content
 
 
 class Event(models.Model):

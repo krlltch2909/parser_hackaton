@@ -3,6 +3,7 @@ app/postgres/data/
 app/postgres/db/
 
 bot/mongo/db/
+bot/logs/
 
 app/db.server
 app/staticfiles/

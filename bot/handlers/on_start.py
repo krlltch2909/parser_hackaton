@@ -17,4 +17,3 @@ async def on_start(dp):
         scope=BotCommandScopeDefault()
     )
     await send_to_admin(dp)
-    

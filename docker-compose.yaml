@@ -49,8 +49,8 @@ services:
       sh -c "python app.py"
     env_file:
       - ./bot/.env
-        #ports:
-      #- 8081:8081
+    volumes:
+      - "./bot/logs:/var/log"
     depends_on:
       - django
       - postgres

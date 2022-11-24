@@ -32,6 +32,7 @@ async def get_events() -> list[Event]:
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url=url, headers=_headers) as response:
+            print(response.text)
             data = await response.json(content_type="application/json")
             events = []
             for raw_event in data:

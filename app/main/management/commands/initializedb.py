@@ -12,11 +12,17 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         with open(DATA_FILE, "r") as file:
             data: dict = json.load(file) 
-            if len(EventTypeClissifier.objects.all()) == 0:  
-                for event_type in data["types"]:
+            for event_type in data["types"]:
+                print("before")
+                exists = EventTypeClissifier.objects.filter(description=event_type)\
+                    .exists()
+                print("after")
+                if not exists:
                     EventTypeClissifier.objects.create(description=event_type)
 
-            if len(Tag.objects.all()) == 0:
-                tags: list = data["tags"].keys()
-                for tag in tags:
+            tags: list = data["tags"].keys()
+            for tag in tags:
+                exists = Tag.objects.filter(description=tag)\
+                    .exists()                
+                if not exists:
                     Tag.objects.create(description=tag)
