@@ -14,6 +14,9 @@ class EventTypeClissifier(models.Model):
     def __str__(self):
         return self.description
 
+    def __hash__(self):
+        return id(self)
+
 
 class HistoryUserRequest(models.Model):
     """
@@ -68,7 +71,7 @@ class Event(models.Model):
     img = models.URLField(max_length=255, null=True)
 
     type_of_event = models.ForeignKey(EventTypeClissifier,
-                                      on_delete=models.DO_NOTHING)
+                                      on_delete=models.CASCADE)
     is_free = models.BooleanField(blank=True, null=True)
 
     tags = models.ManyToManyField(Tag, blank=True)
