@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+from dateutil.tz import tzlocal
 from celery import shared_task
 from dateutil.relativedelta import relativedelta
 
@@ -23,9 +24,10 @@ def clean_data_base() -> None:
     """
     saved_hackatons = Event.objects.all()
     count_if_deleted_events = 0
+    moscow_tz = timezone(timedelta(hours=3))
     for event in saved_hackatons:
         if event.end_date is not None:
-            if event.end_date <= datetime.now() - relativedelta(months=3):
+            if event.end_date < datetime.now(tzlocal()).astimezone(moscow_tz):
                 event.delete()
                 count_if_deleted_events += 1
 
