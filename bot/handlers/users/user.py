@@ -85,18 +85,18 @@ async def get_all_events(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(text_contains="event_list")
 async def get_event_page(query: types.CallbackQuery, state: FSMContext):
     query_data = query.data.split(":")
-    button_type = query_data[1]
+    str_page_number = query_data[1]
 
-    if button_type == "done":
+    # Завершаем просмотр мероприятий
+    if int(str_page_number) == -1:
         await query.message.delete()
         await state.finish()
         return
 
     data = await state.get_data()
-    if button_type == "next":
-        await state.update_data(current_page=data["current_page"] + 1)
-    elif button_type == "back":
-        await state.update_data(current_page=data["current_page"] - 1)
+    page_number = int(str_page_number)
+    await state.update_data(current_page=page_number)
+    
     data = await state.get_data()
     events = data["events"]
     current_page = data["current_page"]

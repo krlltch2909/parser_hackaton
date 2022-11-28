@@ -43,24 +43,24 @@ async def accept_event_type(query: types.CallbackQuery, state: FSMContext):
     callback_data = query.data
     button_data = callback_data.split(":")
     type_code = int(button_data[1])
-    button_type = button_data[2]
+    str_page_number = button_data[2]
     data = await state.get_data()
+    
+    # Если передаем None, значит нажата кнопка с типом мероприятия
+    if str_page_number == "None":
+        async with state.proxy() as data:
+            events_types = add_code(data["events_types"], type_code)
+            data["events_types"] = events_types
 
-    if button_type == "back":
-        new_page = data["current_page"] - 1
         await query.message.\
             edit_reply_markup(await generate_events_types_markup(data["events_types"],
-                                                                 new_page))
-        await state.update_data(current_page=new_page)
-        await PreferencesStatesGroup.events_types.set()
-    elif button_type == "next":
-        new_page = data["current_page"] + 1
-        await query.message.\
-            edit_reply_markup(await generate_events_types_markup(data["events_types"],
-                                                                 new_page))
-        await state.update_data(current_page=new_page)
-        await PreferencesStatesGroup.events_types.set()
-    elif button_type == "done":
+                                                                 data["current_page"]))
+        return
+    
+    page_number = int(str_page_number)
+    
+    # Если номер страницы = -1, то перейти к установке тегов
+    if page_number == -1:
         async with state.proxy() as data:
             # Сброс номера страницы для следующего выбора
             data["current_page"] = 1
@@ -73,14 +73,13 @@ async def accept_event_type(query: types.CallbackQuery, state: FSMContext):
                 reply_markup=await generate_tags_markup(data["tags"], data["current_page"]))
 
         await PreferencesStatesGroup.tags.set()
-    else:
-        async with state.proxy() as data:
-            events_types = add_code(data["events_types"], type_code)
-            data["events_types"] = events_types
-
-        await query.message.\
-            edit_reply_markup(await generate_events_types_markup(data["events_types"],
-                                                                 data["current_page"]))
+        return
+    
+    await query.message.\
+        edit_reply_markup(await generate_events_types_markup(data["events_types"],
+                                                             page_number))
+    await state.update_data(current_page=page_number)
+    await PreferencesStatesGroup.events_types.set()
 
 
 # Получаем и сохраняем новые теги
@@ -89,22 +88,21 @@ async def accept_tag(query: types.CallbackQuery, state: FSMContext):
     callback_data = query.data
     button_data = callback_data.split(":")
     tag_code = int(button_data[1])
-    button_type = button_data[2]
+    str_page_number = button_data[2]
     data = await state.get_data()
 
-    if button_type == "back":
-        new_page = data["current_page"] - 1
+    if str_page_number == "None":
+        async with state.proxy() as data:
+            tags = add_code(data["tags"], tag_code)
+            data["tags"] = tags
+
         await query.message.edit_reply_markup(await generate_tags_markup(data["tags"],
-                                                                         new_page))
-        await state.update_data(current_page=new_page)
-        await PreferencesStatesGroup.tags.set()
-    elif button_type == "next":
-        new_page = data["current_page"] + 1
-        await query.message.edit_reply_markup(await generate_tags_markup(data["tags"],
-                                                                         new_page))
-        await state.update_data(current_page=new_page)
-        await PreferencesStatesGroup.tags.set()
-    elif button_type == "done":
+            data["current_page"]))
+        return
+    
+    page_number = int(str_page_number)
+    
+    if page_number == -1:
         async with state.proxy() as data:
             tags = data["tags"]
             events_types = data["events_types"]
@@ -131,15 +129,14 @@ async def accept_tag(query: types.CallbackQuery, state: FSMContext):
 
             await query.message.delete()
             await bot.send_message(chat_id=user_id, text="Настройки успешно сохранены")
-        # Очистка состояния. Можно ли хранить предпочтения всегда в машине состояний?
-        await state.finish()
-    else:
-        async with state.proxy() as data:
-            tags = add_code(data["tags"], tag_code)
-            data["tags"] = tags
+        # Очистка состояния
+        await state.finish()    
+        return
 
-        await query.message.edit_reply_markup(await generate_tags_markup(data["tags"],
-            data["current_page"]))
+    await query.message.edit_reply_markup(await generate_tags_markup(data["tags"],
+                                                                     page_number))
+    await state.update_data(current_page=page_number)
+    await PreferencesStatesGroup.tags.set()
 
 
 def add_code(already_exists_codes: list[int], code: int) -> list[int]:

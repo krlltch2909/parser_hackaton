@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup
 from ..callback_data import event_type_data
-from ..pref_inline_keyboard import generate_events_pref_inline_keyboard
+from ..pref_keyboard import generate_events_pref_inline_keyboard
 from utils.parser_api import get_events_types
 
 

@@ -9,7 +9,7 @@ from models.Event import Event
 
 _headers = {
         "Authorization": "Token " + token
-    }
+}
 API_BASE_URL = os.getenv("API_BASE_URL")
 if API_BASE_URL is None:
     sys.exit("Incorrect API url")
@@ -32,7 +32,6 @@ async def get_events() -> list[Event]:
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url=url, headers=_headers) as response:
-            print(response.text)
             data = await response.json(content_type="application/json")
             events = []
             for raw_event in data:
