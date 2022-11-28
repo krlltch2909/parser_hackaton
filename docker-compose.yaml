@@ -50,7 +50,7 @@ services:
     env_file:
       - ./bot/.env
     volumes:
-      - "./bot/logs:/var/log"
+      - "./bot/logs:/bot/logs"
     depends_on:
       - django
       - postgres
