@@ -7,7 +7,8 @@ class EventTypeClissifier(models.Model):
     """
     классификатор типов события
     """
-    type_code = models.SmallAutoField(primary_key=True, verbose_name="type_code")
+    type_code = models.SmallAutoField(primary_key=True,
+                                      verbose_name="type_code")
     description = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
@@ -32,10 +33,10 @@ class Tag(models.Model):
     """
     tag_code = models.SmallAutoField(primary_key=True)
     description = models.CharField(max_length=255, unique=True)
-        
+
     def __str__(self):
         return self.description
-    
+
 
 class Keyword(models.Model):
     """
@@ -44,7 +45,7 @@ class Keyword(models.Model):
     keyword_code = models.BigAutoField(primary_key=True)
     content = models.CharField(max_length=255)
     tag_code = models.ForeignKey(Tag, on_delete=models.DO_NOTHING)
-    
+
     def __str__(self) -> str:
         return self.content
 
@@ -61,12 +62,13 @@ class Event(models.Model):
 
     start_date = models.DateTimeField(blank=True, null=True)
     registration_deadline = models.DateTimeField(blank=True, null=True)
-    end_date = models.DateTimeField(blank=True,  null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
 
     url = models.URLField(max_length=255)
     img = models.URLField(max_length=255, null=True)
 
-    type_of_event = models.ForeignKey(EventTypeClissifier, on_delete=models.DO_NOTHING)
+    type_of_event = models.ForeignKey(EventTypeClissifier,
+                                      on_delete=models.DO_NOTHING)
     is_free = models.BooleanField(blank=True, null=True)
 
     tags = models.ManyToManyField(Tag, blank=True)
@@ -80,3 +82,6 @@ class Event(models.Model):
         if isinstance(__o, Event):
             return self.title == __o.title
         return False
+
+    def __hash__(self):
+        return id(self)
