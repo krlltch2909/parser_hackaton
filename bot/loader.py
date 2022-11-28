@@ -12,6 +12,12 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
+# Создаем папки для логов    
+if not os.path.exists(os.path.join(BASE_DIR, "logs/err")) and \
+    not os.path.exists(os.path.join(BASE_DIR, "logs/out")):
+        os.mkdir(os.path.join(BASE_DIR, "logs/err"))
+        os.mkdir(os.path.join(BASE_DIR, "logs/out"))
+
 logging.config.fileConfig(os.path.join(BASE_DIR, "logging.conf"), 
                           defaults={
                               "err_log_file": os.path.join(BASE_DIR, "logs/err/err.log"),
