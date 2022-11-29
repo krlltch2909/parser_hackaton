@@ -48,6 +48,8 @@ async def get_events_by_preferences(events_types: list[int], tags: list[int]) ->
     for tag in tags:
         url += f"tags={tag}&"
     
+    url = url[:-1]
+    
     async with aiohttp.ClientSession() as session:
         async with session.get(url=url, headers=_headers) as response:
             data = await response.json(content_type="application/json")

@@ -70,7 +70,8 @@ async def accept_event_type(query: types.CallbackQuery, state: FSMContext):
             # Отправляем сообщение с выбором тегов
             await bot.send_message(chat_id=chat_id,
                 text="Выберите теги для фильтрации интересующих мероприятий:",
-                reply_markup=await generate_tags_markup(data["tags"], data["current_page"]))
+                reply_markup=await generate_tags_markup(data["tags"], 
+                                                        data["current_page"]))
 
         await PreferencesStatesGroup.tags.set()
         return

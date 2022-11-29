@@ -6,9 +6,12 @@ events_menu = ReplyKeyboardMarkup(
         [
             KeyboardButton("Все события"),
             KeyboardButton("Интересующие события")
+        ],
+        [
+            KeyboardButton("По названию"),
+            KeyboardButton("По адресу")
         ]
     ],
     resize_keyboard=True,
-    one_time_keyboard=False,
     selective=False
 )

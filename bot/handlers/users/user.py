@@ -5,11 +5,12 @@ from aiogram.dispatcher import FSMContext
 from loader import dp, bot
 from keyboards.default.events_menu import events_menu
 from keyboards.inline.events_list_keyboard import get_events_list_keyboard
-from utils.create_event_message import create_event_messsage
+from utils.create_events_response import create_events_response
 from utils.get_indexes import get_indexes
 from utils.database import user_preferences_collection
 from utils.parser_api import get_events, get_events_by_preferences
 from models.Event import Event
+from states.EventStatesGroup import EventStatesGroup
 
 
 PAGE_SIZE = os.getenv("EVENTS_PAGE_SISE")
@@ -69,24 +70,26 @@ async def get_all_events(message: types.Message, state: FSMContext):
     if len(events) == 0:
         result_message = "Не удалось найти мероприятия"
         await bot.send_message(message.from_user.id, result_message)
+    elif len(events) <= page_size:
+        result_message = create_events_response(0, len(data["events"]) - 1, 
+                                                data["events"])
+        await bot.send_message(message.from_user.id, result_message, 
+                               disable_web_page_preview=True)
     else:
-        for raw_event in data["events"][:page_size]:
-            result_message += create_event_messsage(raw_event)
-            result_message += "---------------------------\n\n"
+        result_message = create_events_response(0, page_size-1, data["events"])
         await bot.send_message(message.from_user.id,
-                            result_message,
-                            parse_mode="HTML",
-                            disable_web_page_preview=True,
-                            reply_markup=get_events_list_keyboard(data["current_page"],
-                                                                  page_size,
-                                                                  data["events"]))
+                               result_message,
+                               parse_mode="HTML",
+                               disable_web_page_preview=True,
+                               reply_markup=get_events_list_keyboard(data["current_page"],
+                                                                     page_size,
+                                                                     data["events"]))
 
 
 @dp.callback_query_handler(text_contains="event_list")
 async def get_event_page(query: types.CallbackQuery, state: FSMContext):
     query_data = query.data.split(":")
     str_page_number = query_data[1]
-
     # Завершаем просмотр мероприятий
     if int(str_page_number) == -1:
         await query.message.delete()
@@ -94,22 +97,71 @@ async def get_event_page(query: types.CallbackQuery, state: FSMContext):
         return
 
     data = await state.get_data()
+    current_page_number = data["current_page"]
     page_number = int(str_page_number)
-    await state.update_data(current_page=page_number)
     
+    if page_number != current_page_number:
+        await state.update_data(current_page=page_number)
+        
+        data = await state.get_data()
+        events = data["events"]
+        current_page = data["current_page"]
+        page_size = data["page_size"]
+        start_index, end_index = get_indexes(events, current_page, page_size)
+        new_message_text = create_events_response(start_index, end_index, events)
+
+        await query.message.edit_text(text=new_message_text,
+                                      disable_web_page_preview=True,
+                                      reply_markup=get_events_list_keyboard(current_page,
+                                                                            page_size,
+                                                                            events))
+
+
+@dp.message_handler(lambda message: message.text and message.text\
+    in ["По названию", "По адресу"])
+async def send_name_request(message: types.Message, state: FSMContext):
+    if message.text == "По названию":
+        await message.answer("Введите название интересующего мероприятия")
+    else:
+        await message.answer("Введите адрес или его часть")
+    await state.update_data(type=message.text)
+    await EventStatesGroup.field.set()
+
+
+@dp.message_handler(state=EventStatesGroup.field)
+async def get_events_by_name(message: types.Message, state: FSMContext):
+    field = message.text.lower()
     data = await state.get_data()
-    events = data["events"]
-    current_page = data["current_page"]
-    page_size = data["page_size"]
-    start_index, end_index = get_indexes(events, current_page, page_size)
-    new_message_text = ""
-
-    for i in range(start_index, end_index + 1):
-        new_message_text += create_event_messsage(events[i])
-        new_message_text += "---------------------------\n\n"
-
-    await query.message.edit_text(text=new_message_text,
-                                  disable_web_page_preview=True,
-                                  reply_markup=get_events_list_keyboard(current_page,
-                                                                        page_size,
-                                                                        events))
+    type = data["type"]
+    events = await get_events()
+    result_events: list[Event] = []
+    
+    for event in events:
+        if type == "По названию":
+            if field in event.title.lower():
+                result_events.append(event)
+        else:
+            if event.address is not None and \
+                field in event.address.lower():
+                    result_events.append(event)
+    
+    if len(result_events) == 0:
+        result_message = "Не удалось найти мероприятия"
+        await bot.send_message(message.from_user.id, result_message)
+    elif len(result_events) <= PAGE_SIZE:
+        result_message = create_events_response(0, len(result_events) - 1, 
+                                                result_events)
+        await bot.send_message(message.from_user.id, result_message, 
+                               disable_web_page_preview=True)
+    else:
+        await state.update_data(events=result_events)
+        await state.update_data(page_size=PAGE_SIZE)
+        await state.update_data(current_page=1)
+        result_message = create_events_response(0, PAGE_SIZE-1, result_events)
+        await bot.send_message(message.from_user.id,
+                               result_message,
+                               parse_mode="HTML",
+                               disable_web_page_preview=True,
+                               reply_markup=get_events_list_keyboard(1, PAGE_SIZE,
+                                                                     result_events))
+    await state.reset_state(with_data=False)
