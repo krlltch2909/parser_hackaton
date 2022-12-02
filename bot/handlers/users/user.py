@@ -165,3 +165,14 @@ async def get_events_by_name(message: types.Message, state: FSMContext):
                                reply_markup=get_events_list_keyboard(1, PAGE_SIZE,
                                                                      result_events))
     await state.reset_state(with_data=False)
+
+
+@dp.message_handler(state="*")
+async def cancel_state(message: types.Message, state: FSMContext):
+    current_state = await state.get_state()
+
+    # Если пользователя отправил новое сообщение, то отменить state
+    if current_state != None:
+        await message.answer("Сначала необходимо завершить предыдущее действие!")
+        await message.delete()
+        
