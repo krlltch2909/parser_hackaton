@@ -25,9 +25,14 @@ def clean_data_base() -> None:
     saved_hackatons = Event.objects.all()
     count_if_deleted_events = 0
     moscow_tz = timezone(timedelta(hours=3))
+    today = datetime.now(tzlocal()).astimezone(moscow_tz)
     for event in saved_hackatons:
-        if event.end_date is not None:
-            if event.end_date < datetime.now(tzlocal()).astimezone(moscow_tz):
+        if event.registration_deadline is not None \
+            and event.registration_deadline < today:
+                event.delete()
+                count_if_deleted_events += 1
+        if event.end_date is not None \
+            and event.end_date < today:
                 event.delete()
                 count_if_deleted_events += 1
 
@@ -77,7 +82,8 @@ def parse_new_events() -> None:
     saved_events = Event.objects.all()
     for event in return_rez:
         try:
-            find_same_event = saved_events.filter(title=event.title, start_date=event.start_date)
+            # Проверка на наличие мероприятия
+            find_same_event = saved_events.filter(title=event.title)
 
             if len(find_same_event) == 0:
                 event.save()

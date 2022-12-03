@@ -2,6 +2,7 @@ import os
 from aiogram import types
 from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
+from aiogram.utils.exceptions import MessageToDeleteNotFound
 from loader import dp, bot
 from keyboards.default.events_menu import events_menu
 from keyboards.inline.events_list_keyboard import get_events_list_keyboard
@@ -35,6 +36,18 @@ async def show_events_menu(message: types.Message):
     in ["Все события", "Интересующие события"])
 async def get_all_events(message: types.Message, state: FSMContext):
     events: list[Event] = []
+
+    data = await state.get_data()    
+    # Если сообщение с виджетом перехода по страницам уже существует, 
+    # то его нужно удалить для избежания конфликтов, 
+    # с потенциально разным количеством мероприятий
+    if "last_events_list_message_id" in data:
+        try:
+            await bot.delete_message(message.from_user.id, 
+                                     data["last_events_list_message_id"])
+        except MessageToDeleteNotFound:
+            # Если пользователь удалил сообщение
+            pass
 
     if message.text == "Все события":
         events.extend(await get_events())
@@ -77,14 +90,15 @@ async def get_all_events(message: types.Message, state: FSMContext):
                                disable_web_page_preview=True)
     else:
         result_message = create_events_response(0, page_size-1, data["events"])
-        await bot.send_message(message.from_user.id,
-                               result_message,
-                               parse_mode="HTML",
-                               disable_web_page_preview=True,
-                               reply_markup=get_events_list_keyboard(data["current_page"],
-                                                                     page_size,
-                                                                     data["events"]))
-
+        message = await bot.send_message(message.from_user.id,
+                                         result_message,
+                                         parse_mode="HTML",
+                                         disable_web_page_preview=True,
+                                          reply_markup=get_events_list_keyboard(data["current_page"],
+                                                                                page_size,
+                                                                                data["events"]))
+        # Для отслеживания последнего сообщения со виджетом переключения страниц
+        await state.update_data(last_events_list_message_id=message.message_id)
 
 @dp.callback_query_handler(text_contains="event_list")
 async def get_event_page(query: types.CallbackQuery, state: FSMContext):
@@ -97,6 +111,11 @@ async def get_event_page(query: types.CallbackQuery, state: FSMContext):
         return
 
     data = await state.get_data()
+
+    if "current_page" not in data:
+        await query.message.delete()
+        return
+    
     current_page_number = data["current_page"]
     page_number = int(str_page_number)
     
@@ -120,6 +139,15 @@ async def get_event_page(query: types.CallbackQuery, state: FSMContext):
 @dp.message_handler(lambda message: message.text and message.text\
     in ["По названию", "По адресу"])
 async def send_name_request(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    if "last_events_list_message_id" in data:
+        try:
+            await bot.delete_message(message.from_user.id, 
+                                     data["last_events_list_message_id"])
+        except MessageToDeleteNotFound:
+            # Если пользователь удалил сообщение
+            pass
+    
     if message.text == "По названию":
         await message.answer("Введите название интересующего мероприятия")
     else:
@@ -158,21 +186,22 @@ async def get_events_by_name(message: types.Message, state: FSMContext):
         await state.update_data(page_size=PAGE_SIZE)
         await state.update_data(current_page=1)
         result_message = create_events_response(0, PAGE_SIZE-1, result_events)
-        await bot.send_message(message.from_user.id,
-                               result_message,
-                               parse_mode="HTML",
-                               disable_web_page_preview=True,
-                               reply_markup=get_events_list_keyboard(1, PAGE_SIZE,
-                                                                     result_events))
+        message = await bot.send_message(message.from_user.id,
+                                         result_message,
+                                         parse_mode="HTML",
+                                         disable_web_page_preview=True,
+                                         reply_markup=get_events_list_keyboard(1, PAGE_SIZE,
+                                                                               result_events))
+        # Для отслеживания последнего сообщения со виджетом переключения страниц
+        await state.update_data(last_events_list_message_id=message.message_id)
     await state.reset_state(with_data=False)
 
 
 @dp.message_handler(state="*")
-async def cancel_state(message: types.Message, state: FSMContext):
+async def state_alert(message: types.Message, state: FSMContext):
     current_state = await state.get_state()
 
     # Если пользователя отправил новое сообщение, то отменить state
     if current_state != None:
         await message.answer("Сначала необходимо завершить предыдущее действие!")
         await message.delete()
-        
