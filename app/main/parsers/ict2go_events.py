@@ -32,7 +32,8 @@ def get_ict2go_events() -> list[Event]:
         if (len(raw_events_list.get("class")) == 1)
     ][0]
 
-    raw_events = raw_event_list_filtered.find_all("div", class_="index-events-item")
+    raw_events = raw_event_list_filtered.find_all("div",
+                                                  class_="index-events-item")
 
     event_types = get_event_types()
     events = []
@@ -42,7 +43,7 @@ def get_ict2go_events() -> list[Event]:
 
         event_url = "https://ict2go.ru" \
             f"{raw_event.find('a', class_='event-title').get('href')}"
-        event.img = "https://ict2go.ru" + raw_event.find("img").get("src")
+        # event.img = "https://ict2go.ru" + raw_event.find("img").get("src")
 
         event_raw_type = raw_event.find("a", class_="event-type").string
 
@@ -75,7 +76,7 @@ def get_ict2go_events() -> list[Event]:
         # Проверка на актуальность
         if event.start_date < datetime.now(tzlocal()).astimezone(moscow_tz):
             continue
-        
+
         events.append(event)
 
     return events
@@ -89,7 +90,9 @@ def _get_event_additional_info(event_url: str) -> _EventAdditionalInfo:
     raw_description = soup.find("div", class_="description-info")
     raw_description_lines = raw_description.find_all("p")
     description_lines = [raw_line.string for raw_line in raw_description_lines]
-    description_lines_filtered = [line for line in description_lines if line is not None]
+    description_lines_filtered = [
+        line for line in description_lines if line is not None
+    ]
     description = "\n".join(description_lines_filtered)
 
     url = ""
@@ -109,7 +112,7 @@ def _get_event_additional_info(event_url: str) -> _EventAdditionalInfo:
     raw_date_info = raw_date_info[:raw_date_info.index(". Начало")]
     raw_dates = raw_date_info.split(" - ")
 
-    # Проверка стоимости мероприятия. Если не платное, 
+    # Проверка стоимости мероприятия. Если не платное,
     # то может быть как бесплатное, так и платное
     is_free = None
     if soup.find("p", class_="price-info") is not None:
@@ -126,9 +129,9 @@ def _get_event_additional_info(event_url: str) -> _EventAdditionalInfo:
         start_date = datetime.strptime(raw_dates[0], "%d.%m.%Y")
         end_date = datetime.strptime(raw_dates[0], "%d.%m.%Y")
 
-    return _EventAdditionalInfo(description=description, 
-                                is_free=is_free, 
-                                address=address, 
+    return _EventAdditionalInfo(description=description,
+                                is_free=is_free,
+                                address=address,
                                 url=url,
-                                start_date=start_date, 
+                                start_date=start_date,
                                 end_date=end_date)

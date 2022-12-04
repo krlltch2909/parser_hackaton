@@ -68,7 +68,7 @@ class Event(models.Model):
     end_date = models.DateTimeField(blank=True, null=True)
 
     url = models.URLField(max_length=255)
-    img = models.URLField(max_length=255, null=True)
+    # img = models.URLField(max_length=255, null=True)
 
     type_of_event = models.ForeignKey(EventTypeClissifier,
                                       on_delete=models.CASCADE)

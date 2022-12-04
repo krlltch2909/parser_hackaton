@@ -4,7 +4,6 @@ from datetime import datetime, timedelta, timezone, timedelta
 from main.models import *
 from .utils import get_event_types
 
-
 HACKATHONS = "hackathons"
 CHAMPIOMSHIPS = "championships"
 
@@ -23,7 +22,8 @@ def get_hacks_ai_events() -> list[Event]:
 
     for raw_event in raw_events:
         event = Event()
-        fill_status = _fill_event(event, int(raw_event["id"]), raw_event["type"])
+        fill_status = _fill_event(event, int(raw_event["id"]),
+                                  raw_event["type"])
         if fill_status:
             events.append(event)
 
@@ -32,18 +32,21 @@ def get_hacks_ai_events() -> list[Event]:
 
 def _get_tasks(event_id: int, event_type: str) -> list[str]:
     task_type = "cases" if event_type == HACKATHONS else "tasks"
-    response = requests.get(f"https://hacks-ai.ru/api/v2/{event_type}/{event_id}/{task_type}")
+    response = requests.get(
+        f"https://hacks-ai.ru/api/v2/{event_type}/{event_id}/{task_type}")
     raw_tasks = response.json()
     tasks = []
 
     for raw_task in raw_tasks:
-        tasks.append(raw_task["name"] if event_type == HACKATHONS else raw_task["title"])
-    
+        tasks.append(raw_task["name"] if event_type ==
+                     HACKATHONS else raw_task["title"])
+
     return tasks
 
 
 def _get_event_info(event_id: int, event_type) -> dict:
-    response = requests.get(f"https://hacks-ai.ru/api/v2/{event_type}/{event_id}/info")
+    response = requests.get(
+        f"https://hacks-ai.ru/api/v2/{event_type}/{event_id}/info")
     return response.json()
 
 
@@ -56,14 +59,17 @@ def _fill_event(event: Event, event_id: int, event_type: str) -> bool:
 
     event.address = event_info["address"]
 
-    event.registration_deadline = datetime.fromisoformat(event_info["registrationDeadline"])
+    event.registration_deadline = datetime.fromisoformat(
+        event_info["registrationDeadline"])
 
-    # Переводим в московское время    
+    # Переводим в московское время
     moscow_tz = timezone(timedelta(hours=3))
-    event.registration_deadline = event.registration_deadline.astimezone(moscow_tz)
+    event.registration_deadline = event.registration_deadline.astimezone(
+        moscow_tz)
 
     # Проверка на актуальность
-    if event.registration_deadline < datetime.now(tzlocal()).astimezone(moscow_tz):
+    if event.registration_deadline < datetime.now(
+            tzlocal()).astimezone(moscow_tz):
         return False
 
     description = ""
@@ -73,28 +79,29 @@ def _fill_event(event: Event, event_id: int, event_type: str) -> bool:
         description += f"{i+1}. {tasks[i]}\n"
     event.description = description
 
-    if "img" in event_info.keys():
-        event.img = event_info["img"]
+    # if "img" in event_info.keys():
+    # event.img = event_info["img"]
     event.url = f"https://hacks-ai.ru/{event_type}/{event_id}"
 
     if not _check_availability(event.url):
         return False
-    
 
     if event_type == HACKATHONS:
         event.title = f"'Цифровой прорыв'. Хакатон ({event.address})"
-        
+
         if "Хакатон" not in event_types.keys():
             return False
 
-        event.type_of_event = EventTypeClissifier.objects.get(description="Хакатон")
+        event.type_of_event = EventTypeClissifier.objects.get(
+            description="Хакатон")
     else:
         event.title = f"'Цифровой прорыв'. Чемпионат ({event.address})"
-        
+
         if "Соревнование" not in event_types.keys():
             return False
 
-        event.type_of_event = EventTypeClissifier.objects.get(description="Соревнование")
+        event.type_of_event = EventTypeClissifier.objects.get(
+            description="Соревнование")
 
     event.is_free = True
     return True

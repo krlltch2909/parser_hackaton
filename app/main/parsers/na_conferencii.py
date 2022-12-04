@@ -19,9 +19,7 @@ class _EventAdditionalInfo(TypedDict):
 
 # Категории мероприятий
 categories = [
-    "Информационные технологии",
-    "Биотехнологии",
-    "Технологии",
+    "Информационные технологии", "Биотехнологии", "Технологии",
     "Технические науки (Разное)"
 ]
 
@@ -36,11 +34,18 @@ ref_categories = {
 # Ключевые слова для выявления стоимости мероприятия
 keywords = {
     "paid": {
-        "words": ["руб.", "рублей", ],
-        "regex": ["\d р.", ]
+        "words": [
+            "руб.",
+            "рублей",
+        ],
+        "regex": [
+            "\d р.",
+        ]
     },
     "free": {
-        "words": ["бесплатн", ],
+        "words": [
+            "бесплатн",
+        ],
         "regex": [".*взнос.*не предусм.*"]
     }
 }
@@ -61,7 +66,7 @@ def get_na_conferencii_events() -> list[Event]:
     page_paragraphs = page.find_all("a", class_="page-numbers")
     if len(page_paragraphs) > 1:
         end_page_number = int(page_paragraphs[-2].string)
-        for i in range(2, end_page_number+1):
+        for i in range(2, end_page_number + 1):
             response = requests.post(url + f"/page/{i}")
             html_decoded_string = html.unescape(response.text)
             page = BeautifulSoup(html_decoded_string, "html.parser")
@@ -73,7 +78,7 @@ def get_na_conferencii_events() -> list[Event]:
         for page_raw_event in page_raw_events:
 
             event = _get_event(page_raw_event)
-            
+
             if event is not None:
                 events.append(event)
 
@@ -83,11 +88,11 @@ def get_na_conferencii_events() -> list[Event]:
 def _get_event(raw_event: BS4Tag) -> Event | None:
     event_types = get_event_types()
     event = Event()
-    
+
     event_date_block = raw_event \
         .find("div", class_="notice-item-top-date") \
         .find("p")
-    
+
     event_raw_date = event_date_block.contents[0].strip(" \n")
     event_raw_date_splitted = event_raw_date.split(" - ")
     start_date_day = event_raw_date_splitted[0].split(" ")[0]
@@ -119,22 +124,25 @@ def _get_event(raw_event: BS4Tag) -> Event | None:
     # Устанавливаем московский часововой пояс
     moscow_tz = timezone(timedelta(hours=3))
     event.start_date = event.start_date.replace(tzinfo=moscow_tz)
-    event.end_date = event.end_date.replace(tzinfo=moscow_tz)      
-    event.registration_deadline = event.registration_deadline.replace(tzinfo=moscow_tz)  
-    
+    event.end_date = event.end_date.replace(tzinfo=moscow_tz)
+    event.registration_deadline = event.registration_deadline.replace(
+        tzinfo=moscow_tz)
+
     # Проверка на актуальность
-    if event.registration_deadline < datetime.now(tzlocal()).astimezone(moscow_tz):
-        return None    
+    if event.registration_deadline < datetime.now(
+            tzlocal()).astimezone(moscow_tz):
+        return None
 
     event.title = raw_event \
         .find("div", class_="notice-item-title").find("a").string
     event.url =  raw_event \
-        .find("div", class_="notice-item-title").find("a").get("href")      
+        .find("div", class_="notice-item-title").find("a").get("href")
     event.address = raw_event \
         .find("div", class_="notice-item-top-location") \
         .find("p").string
 
-    is_valid_event, event_additional_info = _get_event_additional_info(event.url)
+    is_valid_event, event_additional_info = _get_event_additional_info(
+        event.url)
     if not is_valid_event:
         return None
 
@@ -145,7 +153,7 @@ def _get_event(raw_event: BS4Tag) -> Event | None:
     raw_tags = tags_div.find_all("a")
     for raw_tag in raw_tags:
         event.description += (". " + raw_tag.string)
-        
+
     if "Конференция" not in event_types.keys():
         return None
 
@@ -157,9 +165,10 @@ def _get_event(raw_event: BS4Tag) -> Event | None:
     return event
 
 
-def _get_event_additional_info(event_url: str) -> tuple[bool, _EventAdditionalInfo]:
+def _get_event_additional_info(
+        event_url: str) -> tuple[bool, _EventAdditionalInfo]:
     tag_types = get_tag_types()
-    
+
     response = requests.get(event_url)
     html_decoded_string = html.unescape(response.text)
     page = BeautifulSoup(html_decoded_string, "html.parser")
@@ -168,16 +177,18 @@ def _get_event_additional_info(event_url: str) -> tuple[bool, _EventAdditionalIn
         .find("div", class_="content-page-body") \
         .find_all("p", recursive=False)
     description = ""
-    alternative_description = page.find("meta", attrs={"name": "description"}).get("content")
+    alternative_description = page.find("meta", attrs={
+        "name": "description"
+    }).get("content")
 
     for paragraph in description_paragraphs:
         if paragraph.string is not None:
             description += f"\n{paragraph.string}"
-    
+
     header = page.find("div", class_="content-page-header-inner")
     raw_tags = header.find_all("a")
     tags = [raw_tag.string for raw_tag in raw_tags]
-    
+
     is_valid_event = False
     for category_name in categories:
         if category_name in tags:
@@ -198,19 +209,20 @@ def _get_event_additional_info(event_url: str) -> tuple[bool, _EventAdditionalIn
     for word in keywords["paid"]["words"]:
         if word in description.lower():
             is_free = False
-    
+
     for regex in keywords["paid"]["regex"]:
         if re.search(regex, description.lower()):
             is_free = False
-    
+
     for word in keywords["free"]["words"]:
         if word in description.lower():
             is_free = True
-    
+
     for regex in keywords["free"]["regex"]:
         if re.search(regex, description.lower()):
             is_free = True
 
-    return (is_valid_event, _EventAdditionalInfo(description=description, 
-                                                 is_free=is_free, 
-                                                 event_tags=event_tags))
+    return (is_valid_event,
+            _EventAdditionalInfo(description=description,
+                                 is_free=is_free,
+                                 event_tags=event_tags))
