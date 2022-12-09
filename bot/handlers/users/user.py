@@ -60,6 +60,7 @@ async def get_all_events(message: types.Message, state: FSMContext):
             await bot.send_message(user.id,
                                    text="Вы не указали ваши предпочтения.\n"\
                                         "Воспользуйтесь командой /preferences.")
+            return
         else:
             events.extend(await get_events_by_preferences(user.events_types, 
                                                           user.tags))
