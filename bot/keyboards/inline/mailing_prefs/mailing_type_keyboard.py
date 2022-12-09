@@ -10,7 +10,7 @@ mailing_type_keyboard = InlineKeyboardMarkup(
         ],
         [
             InlineKeyboardButton("Интересующие события", 
-                                  callback_data=mailing_type_data.new(type="preferences"))
+                                 callback_data=mailing_type_data.new(type="preferences"))
         ]
     ]
 )

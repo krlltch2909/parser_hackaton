@@ -8,7 +8,7 @@ if API_BASE_URL is None:
     sys.exit("Incorrect API url")
 
 
-def login() -> str:
+def get_token() -> str:
     data = {
         "username": os.getenv("USERNAME"),
         "password": os.getenv("PASSWORD")

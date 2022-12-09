@@ -21,7 +21,7 @@ def add_control_buttons(inline_keyboard: list[list[InlineKeyboardButton]],
                                                   data_params))
             buttons.append(InlineKeyboardButton(text=str(f"{pages_count} >>"), 
                                                 callback_data=data.new(**data_params, 
-                                                                        page_number=pages_count)))
+                                                                       page_number=pages_count)))
         else:
             buttons.extend(_get_start_end_buttons(current_page, 1, 
                                                   pages_count, data, 
@@ -30,22 +30,18 @@ def add_control_buttons(inline_keyboard: list[list[InlineKeyboardButton]],
         buttons.append(InlineKeyboardButton(text=str(f"<< 1"), 
                                                 callback_data=data.new(**data_params, 
                                                                         page_number=1)))
-
         buttons.append(InlineKeyboardButton(text=str(f"{current_page - 1}"), 
-                                                callback_data=data.new(**data_params, 
-                                                                        page_number=current_page - 1)))
-
+                                            callback_data=data.new(**data_params, 
+                                                                   page_number=current_page - 1)))
         buttons.append(InlineKeyboardButton(text=str(f"-{current_page}-"), 
-                                                callback_data=data.new(**data_params, 
-                                                                        page_number=current_page)))
-
+                                            callback_data=data.new(**data_params, 
+                                                                   page_number=current_page)))
         buttons.append(InlineKeyboardButton(text=str(f"{current_page + 1}"), 
-                                                callback_data=data.new(**data_params, 
-                                                                        page_number=current_page + 1)))
-
+                                            callback_data=data.new(**data_params, 
+                                                                   page_number=current_page + 1)))
         buttons.append(InlineKeyboardButton(text=str(f"{pages_count} >>"), 
-                                                callback_data=data.new(**data_params, 
-                                                                        page_number=pages_count)))
+                                            callback_data=data.new(**data_params, 
+                                                                   page_number=pages_count)))
     else:
         if pages_count == 4:
             buttons.extend(_get_start_end_buttons(current_page, 1, 
@@ -53,12 +49,11 @@ def add_control_buttons(inline_keyboard: list[list[InlineKeyboardButton]],
                                                   data_params))
         else:
             buttons.append(InlineKeyboardButton(text=str(f"<< 1"), 
-                                                    callback_data=data.new(**data_params, 
-                                                                            page_number=1)))
+                                                callback_data=data.new(**data_params, 
+                                                                       page_number=1)))
             buttons.extend(_get_start_end_buttons(current_page, pages_count-3, 
-                                                pages_count, data, 
-                                                data_params))
-
+                                                  pages_count, data, 
+                                                  data_params))
     inline_keyboard.append(buttons)
     inline_keyboard.append([InlineKeyboardButton(text="Готово", 
                                                  callback_data=data.new(**data_params, 

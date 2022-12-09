@@ -1,18 +1,9 @@
 from datetime import datetime, timezone, timedelta
 from dateutil.tz import tzlocal
 from celery import shared_task
-from dateutil.relativedelta import relativedelta
-
 from .parsers.utils import clean_event
 from .models import Event
-from .parsers.all_events import get_all_events
-from .parsers.hackathon_com import get_hackathon_com_events
-from .parsers.hacks_ai import get_hacks_ai_events
-from .parsers.ict2go_events import get_ict2go_events
-from .parsers.leader_id import get_leader_id_events
-from .parsers.leaders_of_digital import get_leaders_of_digital_events
-from .parsers.na_conferencii import get_na_conferencii_events
-from .parsers.university_2035 import get_2035_university_events
+from .parsers import *
 from .tagger import all_events_tagger
 
 
