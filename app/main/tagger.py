@@ -3,7 +3,7 @@ from django.db.models import QuerySet
 from main.models import Event, Tag, Keyword
 
 
-def update_all_v2(events: QuerySet, word_counter: int = 5):
+def update_all_v2(events: QuerySet, word_counter: int = 5) -> None:
     """
     метод для расстановки тегов
     :param events: список элементов куда будут писаться  теги
@@ -29,7 +29,7 @@ def update_all_v2(events: QuerySet, word_counter: int = 5):
                 event.save()
 
 
-def all_events_tagger():
+def all_events_tagger() -> None:
     """
     метод для растановки тегов для эвентов
     :return: None

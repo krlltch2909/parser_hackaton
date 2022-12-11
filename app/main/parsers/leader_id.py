@@ -3,7 +3,8 @@ import re
 import requests
 from datetime import datetime, timezone, timedelta
 from main.models import *
-from .utils import get_event_types, CLEANER
+from .utils import get_event_types, HTML_TAG_CLEANER
+
 
 _themeIds = [1227, 749, 742, 36, 745, 37, 753, 751, 50]
 
@@ -71,7 +72,7 @@ def _get_event(raw_event: dict) -> Event | None:
     for description_block in event_description_info["blocks"]:
         description_block_data = description_block["data"]
         if "text" in description_block_data.keys():
-            description += re.sub(CLEANER, "",
+            description += re.sub(HTML_TAG_CLEANER, "",
                                   description_block["data"]["text"] + "\n")
 
     event.description = description

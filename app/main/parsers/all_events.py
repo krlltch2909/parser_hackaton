@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
 from main.models import *
-from .utils import get_event_types, CLEANER
+from .utils import get_event_types, HTML_TAG_CLEANER
 
 
 def get_all_events() -> list[Event]:
@@ -52,7 +52,7 @@ def get_all_events() -> list[Event]:
 
             description = ""
             for description_item in description_items:
-                description += re.sub(CLEANER, "", str(description_item)\
+                description += re.sub(HTML_TAG_CLEANER, "", str(description_item)\
                     .strip(" \n\t\r")) + "\n"
 
             description = description.replace("\t", "")

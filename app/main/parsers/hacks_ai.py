@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone, timedelta
 from main.models import *
 from .utils import get_event_types
 
+
 HACKATHONS = "hackathons"
 CHAMPIOMSHIPS = "championships"
 

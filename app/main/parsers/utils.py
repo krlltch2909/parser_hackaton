@@ -1,8 +1,8 @@
 import re
 from main.models import *
 
-# Регулярное выражение, позволяющее очищать текст от html-тегов
-CLEANER = re.compile('<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
+
+HTML_TAG_CLEANER = re.compile('<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
 
 
 def get_event_types() -> dict[str, int]:
@@ -19,9 +19,18 @@ def get_tag_types() -> dict[str, int]:
     return tag_types
 
 
-def clean_event(event: Event) -> None:
-    event.title = re.sub(CLEANER, "", event.title)
-    event.description = re.sub(CLEANER, "", event.description)
-    
+def clean_event(event: Event) -> None:    
+    clean_event_title(event)
+    event.description = re.sub(HTML_TAG_CLEANER, "", event.description)
     if event.address is not None:
-        event.address = re.sub(CLEANER, "", event.address)
+        event.address = re.sub(HTML_TAG_CLEANER, "", event.address)
+
+
+def clean_event_title(event: Event) -> None:
+    event.title = re.sub(HTML_TAG_CLEANER, "", event.title)
+    splitted_title = event.title.split(" ")
+    result_parts = []
+    for title_part in splitted_title:
+        if "#" not in title_part:
+            result_parts.append(title_part)     
+    event.title = " ".join(result_parts)

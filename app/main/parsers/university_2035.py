@@ -6,7 +6,7 @@ from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
 from typing import TypedDict
 from main.models import *
-from .utils import CLEANER, get_event_types
+from .utils import HTML_TAG_CLEANER, get_event_types
 
 
 class _EventAdditionalInfo(TypedDict):
@@ -113,7 +113,7 @@ def _get_event_additional_info(event_url: str) -> _EventAdditionalInfo | None:
 
         description = ""
         for description_paragraph in description_paragraphs:
-            description += f"\n{re.sub(CLEANER, '', description_paragraph)}"
+            description += f"\n{re.sub(HTML_TAG_CLEANER, '', description_paragraph)}"
 
     all_bold_tags = event_page.find_all("b")
     date_paragraph_list = [

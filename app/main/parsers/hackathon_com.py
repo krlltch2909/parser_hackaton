@@ -4,7 +4,7 @@ import requests
 from dateutil.tz import tzlocal
 from datetime import datetime, timedelta, timezone, timedelta
 from main.models import *
-from .utils import CLEANER, get_event_types
+from .utils import HTML_TAG_CLEANER, get_event_types
 
 
 def get_hackathon_com_events() -> list[Event]:
@@ -29,7 +29,7 @@ def get_hackathon_com_events() -> list[Event]:
         event.title = raw_event["title"]
 
         # Очистка текста от html-тегов и других символов
-        event.description = re.sub(CLEANER, "", raw_event["descr"])
+        event.description = re.sub(HTML_TAG_CLEANER, "", raw_event["descr"])
         event.registration_deadline = datetime\
             .strptime(raw_event["date"], "%Y-%m-%d %H:%M")
 
