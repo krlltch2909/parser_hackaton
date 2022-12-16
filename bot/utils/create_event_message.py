@@ -38,7 +38,7 @@ def _format_title(title: str, words_separator: str) -> str:
     current_row = ""
     
     for part in title_parts:
-        current_row += " " + part
+        current_row += part + " "
         
         if len(current_row) >= 40:
             result_title += current_row + "\n"
