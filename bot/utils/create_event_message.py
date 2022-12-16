@@ -1,5 +1,10 @@
+import os
 from datetime import datetime
 from models.Event import Event
+
+
+MAX_ROW_LENGTH = os.getenv("EVENTS_ROW_MAX_LENGTH")
+MAX_ROW_LENGTH = int(MAX_ROW_LENGTH) if MAX_ROW_LENGTH else 25 
 
 
 def create_event_messsage(event: Event) -> str:
@@ -40,7 +45,7 @@ def _format_title(title: str, words_separator: str) -> str:
     for part in title_parts:
         current_row += part + " "
         
-        if len(current_row) >= 40:
+        if len(current_row) >= MAX_ROW_LENGTH:
             result_title += current_row + "\n"
             current_row = ""
     
