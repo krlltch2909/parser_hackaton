@@ -8,7 +8,7 @@ def create_event_messsage(event: Event) -> str:
     для отправки пользователю
     """
     message = ""
-    message += f"<b>{event.title}</b>\n\n"
+    message += f"<b>{_format_title(event.title, ' ')}</b>\n\n"
     if event.address is not None:
         message += f"<i>Место проведения:</i> {event.address}\n"
     if event.start_date is not None and event.end_date is not None:
@@ -30,3 +30,21 @@ def create_event_messsage(event: Event) -> str:
     message += "\n"
     message += f"<a href=\"{event.url}\">Подробнее</a>\n"
     return message
+
+
+def _format_title(title: str, words_separator: str) -> str:
+    title_parts = title.split(words_separator)
+    result_title = ""
+    current_row = ""
+    
+    for part in title_parts:
+        current_row += " " + part
+        
+        if len(current_row) >= 40:
+            result_title += current_row + "\n"
+            current_row = ""
+    
+    if len(current_row) != 0:
+        result_title += current_row
+    
+    return result_title

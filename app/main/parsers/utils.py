@@ -32,5 +32,5 @@ def clean_event_title(event: Event) -> None:
     result_parts = []
     for title_part in splitted_title:
         if "#" not in title_part:
-            result_parts.append(title_part)     
+            result_parts.append(title_part)    
     event.title = " ".join(result_parts)

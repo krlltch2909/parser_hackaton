@@ -59,25 +59,19 @@ class User(BaseModel):
     @classmethod
     async def init_user(cls, user_id: int):
         user_data = await user_preferences_collection.find_one({"_id": user_id})
-        return User.parse_obj(user_data)
+        if user_data is None:
+            await cls.__instantiate_user(user_id)
+            user_preferences = await user_preferences_collection.find_one({"_id": user_id})
+            return User.parse_obj(user_preferences)
+        else:
+            return User.parse_obj(user_data)
 
     @staticmethod
-    async def instantiate_user(user_id: int) -> None:
-        user_preferences = await user_preferences_collection.find_one({"_id": user_id})
-        if user_preferences is None:
-            await user_preferences_collection.insert_one({
-                "_id": user_id,
-                "events_types": [],
-                "tags": [],
-                "mailing_status": False,
-                "mailing_type": "all"
-            })
-        else:
-            update_data = {
-                "events_types": [],
-                "tags": [],
-                "mailing_status": False,
-                "mailing_type": "all"
-            }
-            await user_preferences_collection.update_one({"_id": user_id}, 
-                                                         {"$set": update_data})
+    async def __instantiate_user(user_id: int) -> None:
+        await user_preferences_collection.insert_one({
+            "_id": user_id,
+            "events_types": [],
+            "tags": [],
+            "mailing_status": False,
+            "mailing_type": "all"
+        })

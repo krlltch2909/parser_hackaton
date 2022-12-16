@@ -8,7 +8,6 @@ from keyboards.default.events_menu import events_menu
 from keyboards.inline.events_list_keyboard import get_events_list_keyboard
 from utils.create_events_response import create_events_response
 from utils.get_indexes import get_indexes
-from database import user_preferences_collection
 from utils.parser_api import get_events, get_events_by_preferences
 from models.Event import Event
 from models.User import User
@@ -22,7 +21,7 @@ PAGE_SIZE = int(PAGE_SIZE) if PAGE_SIZE is not None else 5
 @dp.message_handler(Command("start"))
 async def show_start_menu(message: types.Message):
     user_id = message.from_user.id
-    await User.instantiate_user(user_id)
+    await User.init_user(user_id)    
     await message.answer("Добро пожаловать!\nВыберите команду /events" \
         " для начала работы с мероприятиями.\nКоманда /preferences" \
         " позволит вам выбрать категории для отображения инетересующих вас мероприятий." \
