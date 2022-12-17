@@ -116,6 +116,10 @@ def _get_event_additional_info(event_url: str) -> _EventAdditionalInfo | None:
             description += f"\n{re.sub(HTML_TAG_CLEANER, '', description_paragraph)}"
 
     all_bold_tags = event_page.find_all("b")
+    # Добавляем теги
+    tags_divs = event_page.find_all(class_="accelerator__tag")
+    for tag_div in tags_divs:
+        description += tag_div.string
     date_paragraph_list = [
         b.parent for b in all_bold_tags if "Даты проведения" in b.string
     ]
