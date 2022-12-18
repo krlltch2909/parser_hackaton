@@ -1,12 +1,18 @@
 import html
 import re
 import requests
+from enum import Enum
 from bs4 import BeautifulSoup
-from dateutil.tz import tzlocal
 from datetime import datetime, timezone, timedelta
 from typing import TypedDict
 from main.models import *
 from .utils import HTML_TAG_CLEANER, get_event_types
+
+
+class _AcceleratorStatus(Enum):
+    IN_PROCESS = "Идет акселерация"
+    REGISTRATION = "Готовится к открытию"
+    CLOSED = "Закрыт"
 
 
 class _EventAdditionalInfo(TypedDict):
@@ -59,38 +65,41 @@ def get_2035_university_events() -> list[Event]:
 
         for page_raw_event in page_raw_events:
             event = Event()
+            
+            event_status_div = page_raw_event.find("div", class_="accelerator__tag")
+            event_status =  _get_event_status(event_status_div.string)            
+            if event_status == _AcceleratorStatus.CLOSED:
+                continue
+            
             event.title = page_raw_event.find("h4").string
             event.url = base_url + page_raw_event.get("href")
-            # event.img = page_raw_event.find("img").get("src")
-            event_additional_info = _get_event_additional_info(event.url)
-
-            if event_additional_info is None:
-                continue
+            event_additional_info = _get_event_additional_info(event.url, event_status)
 
             event.description = event_additional_info["description"]
             event.start_date = event_additional_info["start_date"]
             event.end_date = event_additional_info["end_date"]
-
-            # Устанавливаем московский часововой пояс
-            moscow_tz = timezone(timedelta(hours=3))
-            event.start_date = event.start_date.replace(tzinfo=moscow_tz)
-            event.end_date = event.end_date.replace(tzinfo=moscow_tz)
 
             event.type_of_event = EventTypeClissifier \
                 .objects.get(type_code=event_types["Акселератор"])
 
             event.is_free = True
 
-            # Проверка на актуальность
-            if event.end_date < datetime.now(tzlocal()).astimezone(moscow_tz):
-                continue
-
             events.append(event)
 
     return events
 
 
-def _get_event_additional_info(event_url: str) -> _EventAdditionalInfo | None:
+def _get_event_status(raw_event_status: str) -> _AcceleratorStatus:
+    if raw_event_status == _AcceleratorStatus.IN_PROCESS.value:
+        return _AcceleratorStatus.IN_PROCESS
+    elif raw_event_status == _AcceleratorStatus.REGISTRATION.value:
+        return _AcceleratorStatus.REGISTRATION
+    else:
+        return _AcceleratorStatus.CLOSED
+
+
+def _get_event_additional_info(event_url: str, 
+                               event_status: _AcceleratorStatus) -> _EventAdditionalInfo:
     response = requests.get(event_url)
     html_decoded_string = html.unescape(response.text)
     event_page = BeautifulSoup(html_decoded_string, "html.parser")
@@ -120,23 +129,30 @@ def _get_event_additional_info(event_url: str) -> _EventAdditionalInfo | None:
     tags_divs = event_page.find_all(class_="accelerator__tag")
     for tag_div in tags_divs:
         description += tag_div.string
-    date_paragraph_list = [
-        b.parent for b in all_bold_tags if "Даты проведения" in b.string
-    ]
-    if len(date_paragraph_list) != 0:
-        date_paragraph = date_paragraph_list[0]
-        date_string = date_paragraph.contents[2] \
-                                    .strip(" \n") \
-                                    .replace(" ", "") \
-                                    .replace("\n", "")
+    
+    start_date = None
+    end_date = None
+    if event_status == _AcceleratorStatus.IN_PROCESS or \
+        event_status == _AcceleratorStatus.REGISTRATION:  
+        date_paragraph_list = [
+            b.parent for b in all_bold_tags if "Даты проведения" in b.string
+        ]
+        if len(date_paragraph_list) != 0:
+            date_paragraph = date_paragraph_list[0]
+            date_string = date_paragraph.contents[2] \
+                                        .strip(" \n") \
+                                        .replace(" ", "") \
+                                        .replace("\n", "")
 
-        date_strings = date_string.split("-")
-        start_date = datetime.strptime(date_strings[0], "%d.%m.%Y")
-        end_date = datetime.strptime(date_strings[1], "%d.%m.%Y")
+            date_strings = date_string.split("-")
+            start_date = datetime.strptime(date_strings[0], "%d.%m.%Y")
+            end_date = datetime.strptime(date_strings[1], "%d.%m.%Y")
+            
+            # Устанавливаем московский часововой пояс
+            moscow_tz = timezone(timedelta(hours=3))
+            start_date = start_date.replace(tzinfo=moscow_tz)
+            end_date = end_date.replace(tzinfo=moscow_tz)
 
-        return _EventAdditionalInfo(description=description,
-                                    start_date=start_date,
-                                    end_date=end_date)
-
-    # Если нет дат начала и конца, то нужно пропустить
-    return None
+    return _EventAdditionalInfo(description=description,
+                                start_date=start_date,
+                                end_date=end_date)
