@@ -39,17 +39,17 @@ def create_event_messsage(event: Event) -> str:
 
 def _format_title(title: str, words_separator: str) -> str:
     title_parts = title.split(words_separator)
-    result_title = ""
+    result_title_parts = []
     current_row = ""
     
     for part in title_parts:
         current_row += part + " "
         
         if len(current_row) >= MAX_ROW_LENGTH:
-            result_title += current_row + "\n"
+            result_title_parts.append(current_row)
             current_row = ""
     
     if len(current_row) != 0:
-        result_title += current_row
+        result_title_parts.append(current_row)
     
-    return result_title
+    return "\n".join(result_title_parts)
