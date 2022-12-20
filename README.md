@@ -7,7 +7,7 @@
 
 
 
-
+![pngwing com](https://user-images.githubusercontent.com/78617414/208722308-eff12fa3-7ba3-43c7-bed3-58e796470172.png)
 
 ИНСТРУКЦИЯ ПО ЭКСПЛУАТАЦИИ ИНФОРМАЦИОННОЙ СИСТЕМЫ
 
