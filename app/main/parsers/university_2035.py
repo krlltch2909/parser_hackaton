@@ -81,7 +81,16 @@ def get_2035_university_events() -> list[Event]:
             event.description = event_additional_info["description"]
             event.start_date = event_additional_info["start_date"]
             event.end_date = event_additional_info["end_date"]
-
+            
+            # Устанавливаем московский часововой пояс
+            moscow_tz = timezone(timedelta(hours=3))
+            event.start_date = event.start_date.replace(tzinfo=moscow_tz)
+            event.end_date = event.end_date.replace(tzinfo=moscow_tz)
+            
+            # Проверка на актуальность
+            if event.end_date < datetime.now(tzlocal()).astimezone(moscow_tz):
+                continue
+             
             event.type_of_event = EventTypeClissifier \
                 .objects.get(type_code=event_types["Акселератор"])
 
