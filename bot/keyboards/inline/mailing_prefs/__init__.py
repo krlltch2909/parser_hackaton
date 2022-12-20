@@ -1,0 +1,2 @@
+from .mailing_status_keyboard import mailing_status_keyboard
+from .mailing_type_keyboard import mailing_type_keyboard

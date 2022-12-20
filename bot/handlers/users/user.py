@@ -1,16 +1,14 @@
 import os
+from utils import *
+from models import *
+from keyboards.inline import *
 from aiogram import types
 from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import MessageToDeleteNotFound
+from .handlers_utils import cancel_message_exists
 from loader import dp, bot
 from keyboards.default.events_menu import events_menu
-from keyboards.inline.events_list_keyboard import get_events_list_keyboard
-from utils.create_events_response import create_events_response
-from utils.get_indexes import get_indexes
-from utils.parser_api import get_events, get_events_by_preferences
-from models.Event import Event
-from models.User import User
 from states.EventStatesGroup import EventStatesGroup
 
 
@@ -41,7 +39,7 @@ async def get_all_events(message: types.Message, state: FSMContext):
 
     data = await state.get_data()    
     # Если сообщение с виджетом перехода по страницам уже существует, 
-    # то его нужно удалить для избежания конфликтов, 
+    # то его нужно удалить для избежания конфликтов
     # с потенциально разным количеством мероприятий
     if "last_events_list_message_id" in data:
         try:
@@ -92,6 +90,7 @@ async def get_all_events(message: types.Message, state: FSMContext):
                                                                                data["events"]))
         # Для отслеживания последнего сообщения с виджетом переключения страниц
         await state.update_data(last_events_list_message_id=message.message_id)
+
 
 @dp.callback_query_handler(text_contains="event_list")
 async def get_event_page(query: types.CallbackQuery, state: FSMContext):
@@ -191,8 +190,10 @@ async def get_events_by_name(message: types.Message, state: FSMContext):
 @dp.message_handler(state="*")
 async def state_alert(message: types.Message, state: FSMContext):
     current_state = await state.get_state()
-
-    # Если пользователя отправил новое сообщение, то отменить state
-    if current_state != None:
-        await message.answer("Сначала необходимо завершить предыдущее действие!")
-        await message.delete()
+    state_data = await state.get_data()
+    
+    if not cancel_message_exists(state_data) and current_state != None:
+        new_message = await message.answer("Сначала необходимо завершить предыдущее действие!",
+                                           reply_markup=cancel_action_keyboard)
+        await state.update_data(existing_cancel_message_id=new_message.message_id)
+    await message.delete()

@@ -3,7 +3,7 @@ import sys
 import time
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from utils.login import get_token
+from login import get_token
 import logging
 import logging.config
 from pathlib import Path

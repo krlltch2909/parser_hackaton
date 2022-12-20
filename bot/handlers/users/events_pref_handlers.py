@@ -1,11 +1,10 @@
+from keyboards.inline.events_prefs import *
+from .handlers_utils import try_delete_cancel_message
 from aiogram import types
 from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
 from loader import dp, bot
 from states.PreferencesStatesGroup import PreferencesStatesGroup
-from keyboards.inline.events_prefs. \
-    events_types_keyboard import generate_events_types_markup
-from keyboards.inline.events_prefs.tags_keyboard import generate_tags_markup
 from models.User import User
 
 
@@ -15,11 +14,10 @@ async def start_pref_setting(message: types.Message, state: FSMContext):
     await user.save_to_state(state)
     await state.update_data(current_page=1)
     
-    await message.answer("Выберите интересующие вас виды мероприятий:",
-                         reply_markup=await generate_events_types_markup(user.events_types, 
-                                                                         1))
-
-    # Перенаправляем на хендлер-обработчик ответа
+    message = await message.answer("Выберите интересующие вас виды мероприятий:",
+                                   reply_markup=await generate_events_types_markup(user.events_types, 
+                                                                                   1))
+    await state.update_data(blocking_message_id=message.message_id)
     await PreferencesStatesGroup.events_types.set()
 
 
@@ -53,12 +51,13 @@ async def accept_event_type(query: types.CallbackQuery, state: FSMContext):
         await state.update_data(current_page=1)
         await query.message.delete()
 
-        # Отправляем сообщение с выбором тегов
-        await bot.send_message(chat_id=user.id,
-            text="Выберите теги для фильтрации интересующих мероприятий:",
-            reply_markup=await generate_tags_markup(user.tags, 
-                                                    1))
-
+        message = await bot.send_message(chat_id=user.id,
+                                         text="Выберите теги для фильтрации " \
+                                              "интересующих мероприятий:",
+                                         reply_markup=await generate_tags_markup(user.tags, 
+                                                                                 1))
+        await state.update_data(blocking_message_id=message.message_id)
+        await try_delete_cancel_message(state)
         await PreferencesStatesGroup.tags.set()
         return
     
@@ -96,6 +95,7 @@ async def accept_tag(query: types.CallbackQuery, state: FSMContext):
         await query.message.delete()
         await bot.send_message(chat_id=user.id, 
                                text="Настройки успешно сохранены")
+        await try_delete_cancel_message(state)
         await state.finish()    
         return
 

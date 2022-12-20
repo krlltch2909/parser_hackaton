@@ -2,9 +2,7 @@ import aiohttp
 import os
 import sys
 from loader import token
-from models.EventType import EventType
-from models.EventTag import EventTag
-from models.Event import Event
+from models import *
 
 
 _headers = {
