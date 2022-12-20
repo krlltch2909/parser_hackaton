@@ -6,8 +6,7 @@
  Весь проект для удобства упакован в докер. 
 
 
-
-![pngwing com](https://user-images.githubusercontent.com/78617414/208722308-eff12fa3-7ba3-43c7-bed3-58e796470172.png)
+![imgonline-com-ua-Resize-3Ciincl8so](https://user-images.githubusercontent.com/78617414/208722696-a262e19d-607c-4659-a3e7-c557f99f1b55.jpg)
 
 ИНСТРУКЦИЯ ПО ЭКСПЛУАТАЦИИ ИНФОРМАЦИОННОЙ СИСТЕМЫ
 
