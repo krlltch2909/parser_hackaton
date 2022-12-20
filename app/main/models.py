@@ -7,7 +7,7 @@ from django.db import models
 
 class EventTypeClissifier(models.Model):
     """
-    классификатор типов события
+    классификатор типов событий
     """
     type_code = models.SmallAutoField(primary_key=True,
                                       verbose_name="type_code")
@@ -22,7 +22,7 @@ class EventTypeClissifier(models.Model):
 
 class HistoryUserRequest(models.Model):
     """
-    модель для записей о времени обращения конкретного пользователя к серверу
+    модель для записей времени обращения конкретного пользователя к серверу
     """
 
     user_id = models.IntegerField(primary_key=True)
@@ -57,10 +57,10 @@ class Keyword(models.Model):
 
 class Event(models.Model):
     """
-    модель всех событий
+    модель события
     """
     id = models.BigAutoField(primary_key=True)
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, unique=True)
     description = models.TextField()
 
     address = models.CharField(max_length=255, blank=True, null=True)

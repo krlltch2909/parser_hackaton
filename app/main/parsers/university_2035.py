@@ -74,6 +74,9 @@ def get_2035_university_events() -> list[Event]:
             event.title = page_raw_event.find("h4").string
             event.url = base_url + page_raw_event.get("href")
             event_additional_info = _get_event_additional_info(event.url, event_status)
+            
+            if event_additional_info is None:
+                continue
 
             event.description = event_additional_info["description"]
             event.start_date = event_additional_info["start_date"]
@@ -99,7 +102,10 @@ def _get_event_status(raw_event_status: str) -> _AcceleratorStatus:
 
 
 def _get_event_additional_info(event_url: str, 
-                               event_status: _AcceleratorStatus) -> _EventAdditionalInfo:
+                               event_status: _AcceleratorStatus) -> _EventAdditionalInfo | None:
+    """
+    Возвращает None, если нет информации о датах проведения (мероприятие стоит пропустить)
+    """
     response = requests.get(event_url)
     html_decoded_string = html.unescape(response.text)
     event_page = BeautifulSoup(html_decoded_string, "html.parser")
@@ -130,8 +136,6 @@ def _get_event_additional_info(event_url: str,
     for tag_div in tags_divs:
         description += tag_div.string
     
-    start_date = None
-    end_date = None
     if event_status == _AcceleratorStatus.IN_PROCESS or \
         event_status == _AcceleratorStatus.REGISTRATION:  
         date_paragraph_list = [
@@ -153,6 +157,7 @@ def _get_event_additional_info(event_url: str,
             start_date = start_date.replace(tzinfo=moscow_tz)
             end_date = end_date.replace(tzinfo=moscow_tz)
 
-    return _EventAdditionalInfo(description=description,
-                                start_date=start_date,
-                                end_date=end_date)
+            return _EventAdditionalInfo(description=description,
+                                        start_date=start_date,
+                                        end_date=end_date)
+    return None

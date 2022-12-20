@@ -32,5 +32,9 @@ def clean_event_title(event: Event) -> None:
     result_parts = []
     for title_part in splitted_title:
         if "#" not in title_part:
-            result_parts.append(title_part)    
-    event.title = " ".join(result_parts)
+            result_parts.append(title_part)
+    
+    # Бывает, когда название состоит только из тега/тегов
+    # В таком случае стоит оставить исходное название
+    if len(result_parts) != 0:
+        event.title = " ".join(result_parts)
