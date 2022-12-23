@@ -1,27 +1,25 @@
 version: "3.9"
 
 services:
-# брокер сообщений
+  # брокер сообщений
   redis:
     container_name: redis
     restart: unless-stopped
     image: redis
 
-
-# база данных
+  # база данных
   postgres:
-      container_name: postgres
-      image: postgres
-      restart: unless-stopped
-      env_file:
-        - ./app/.env
-      environment:
-          PGDATA: /var/lib/postgresql/data/db/
-      volumes:
-        - ./app/postgres:/var/lib/postgresql/data/
+    container_name: postgres
+    image: postgres
+    restart: unless-stopped
+    env_file:
+      - ./app/.env
+    environment:
+      PGDATA: /var/lib/postgresql/data/db/
+    volumes:
+      - ./app/postgres:/var/lib/postgresql/data/
 
-
-# основной сервер
+  # основной сервер
   django:
     container_name: django
     restart: unless-stopped
@@ -29,17 +27,13 @@ services:
       context: app/
     env_file:
       - ./app/.env
-    # expose:
-    #  - 8000
-        #ports:
-        #- "8000:8000"
     depends_on:
       - postgres
     volumes:
       - static_data:/server/staticfiles
       - ./app/supervisor/logs/:/var/log
 
-#
+  #
   bot:
     container_name: bot
     restart: unless-stopped
@@ -56,7 +50,7 @@ services:
       - postgres
       - mongodb
 
-# база данных для бота
+  # база данных для бота
   mongodb:
     image: mongo:5.0
     restart: unless-stopped
@@ -68,20 +62,18 @@ services:
     volumes:
       - ./bot/mongo/db/:/data/db
 
-# веб-сервис nginx
+  # веб-сервис nginx
   nginx:
     restart: unless-stopped
     image: nginx:latest
     container_name: nginx
     volumes:
       - ./nginx_conf/nginx-conf.d:/etc/nginx/conf.d/default.conf
-      - ./nginx_conf/logs/:/etc/nginx/logs/
-      - static_data:/server/staticfiles/ 
+      - static_data:/server/staticfiles/
     ports:
       - "80:80"
     depends_on:
       - django
-
 
 volumes:
   static_data:
