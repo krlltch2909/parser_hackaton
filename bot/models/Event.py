@@ -4,6 +4,9 @@ from .EventTag import EventTag
 
 
 class Event(BaseModel):
+    """
+    Модель мероприятия, получаемого с помощью API
+    """
     id: int
     title: str
     description: str

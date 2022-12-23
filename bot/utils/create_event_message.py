@@ -9,11 +9,10 @@ MAX_ROW_LENGTH = int(MAX_ROW_LENGTH) if MAX_ROW_LENGTH else 25
 
 def create_event_messsage(event: Event) -> str:
     """
-    Функция создает текст на основании переданного мероприятия 
-    для отправки пользователю
+    Функция создает текст сообщения на основании переданного мероприятия
     """
     message = ""
-    message += f"<b>{_format_title(event.title, ' ')}</b>\n\n"
+    message += f"<b>{__format_title(event.title, ' ')}</b>\n\n"
     if event.address is not None:
         message += f"<i>Место проведения:</i> {event.address}\n"
     if event.start_date is not None and event.end_date is not None:
@@ -37,7 +36,7 @@ def create_event_messsage(event: Event) -> str:
     return message
 
 
-def _format_title(title: str, words_separator: str) -> str:
+def __format_title(title: str, words_separator: str) -> str:
     title_parts = title.split(words_separator)
     result_title_parts = []
     current_row = ""

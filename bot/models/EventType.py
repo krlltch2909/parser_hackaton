@@ -2,5 +2,9 @@ from pydantic import BaseModel
 
 
 class EventType(BaseModel):
-    description: str
+    """
+    Модель типа, получаемого с помощью API
+    """
     type_code: int
+    description: str
+ 

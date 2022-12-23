@@ -1,10 +1,13 @@
 import aiohttp
+import logging
 import os
 import sys
 from loader import token
+from aiohttp.client_exceptions import ClientConnectionError
 from models import *
 
 
+logger = logging.getLogger(f"root.{__name__}")
 _headers = {
         "Authorization": "Token " + token
 }
@@ -13,6 +16,18 @@ if API_BASE_URL is None:
     sys.exit("Incorrect API url")
 
 
+def api_request_error_handler(func):
+    async def wrapper(*args, **kwargs):
+        try:
+            return await func(*args, **kwargs)
+        except ClientConnectionError:
+            logger.error("Can't connect to server")
+            return []
+    wrapper.__name__ == func.__name__
+    return wrapper
+
+
+@api_request_error_handler
 async def get_events_types() -> list[EventType]:
     url = API_BASE_URL + "hackaton/types/"
 
@@ -23,8 +38,9 @@ async def get_events_types() -> list[EventType]:
             for raw_event_type in data:
                 events_types.append(EventType.parse_obj(raw_event_type))
             return events_types
+        
 
-
+@api_request_error_handler
 async def get_events() -> list[Event]:
     url = API_BASE_URL + "hackaton/"
 
@@ -37,6 +53,7 @@ async def get_events() -> list[Event]:
             return events
 
 
+@api_request_error_handler
 async def get_events_by_preferences(events_types: list[int], tags: list[int]) -> list[Event]:
     url = API_BASE_URL + "hackaton/?"
 
@@ -57,6 +74,7 @@ async def get_events_by_preferences(events_types: list[int], tags: list[int]) ->
             return events
 
 
+@api_request_error_handler
 async def get_tags() -> list[EventTag]:
     url = API_BASE_URL + "hackaton/tags/"
 
@@ -69,6 +87,7 @@ async def get_tags() -> list[EventTag]:
             return tags
 
 
+@api_request_error_handler
 async def get_updates() -> list[Event]:
     """
     Функция для получения новых мероприятий.

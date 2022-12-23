@@ -5,6 +5,9 @@ from models.Event import Event
 
 
 class User(BaseModel):
+    """
+    Модель пользователя бота 
+    """
     id: int = Field(alias="_id")
     events_types: list[int]
     tags: list[int]

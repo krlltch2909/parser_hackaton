@@ -6,8 +6,8 @@ from main.models import Event, Tag, Keyword
 def update_all_v2(events: QuerySet, word_counter: int = 5) -> None:
     """
     метод для расстановки тегов
-    :param events: список элементов куда будут писаться  теги
-    :param word_counter: количество слов нужных постановки тега
+    :param events: список элементов, которым будут присваиваться теги
+    :param word_counter: кол-во совпадений слов, необходимое для присваивания тега
     :return: None
     """
     tags = Tag.objects.all()
@@ -31,7 +31,7 @@ def update_all_v2(events: QuerySet, word_counter: int = 5) -> None:
 
 def all_events_tagger() -> None:
     """
-    метод для растановки тегов для эвентов
+    метод для растановки тегов для ивентов
     :return: None
     """
     events = Event.objects.all()
