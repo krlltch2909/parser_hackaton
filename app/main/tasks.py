@@ -8,6 +8,10 @@ from .tagger import all_events_tagger
 
 @shared_task
 def clean_database() -> None:
+    """
+    Метод для переодической очстки базы данных.
+    Назначается на опеределенный периуд в админке
+    """
     saved_hackatons = Event.objects.all()
     count_if_deleted_events = 0
     for event in saved_hackatons:
@@ -20,15 +24,17 @@ def clean_database() -> None:
 
 @shared_task
 def parse_new_events() -> None:
-    all_threads = [get_all_events,
-                   get_hackathon_com_events,
-                   get_hacks_ai_events,
-                   get_ict2go_events,
-                   get_leader_id_events,
-                   get_leaders_of_digital_events,
-                   get_na_conferencii_events,
-                   get_2035_university_events
-                   ]
+    """
+    метод для сбора новый информации с сайтав.
+    Реализовано по средствам запуска всех парсеров,
+    и дальнейшеее сохранение полученных мероприятий.
+    Назначается на опеределенный периуд в админке
+    """
+    all_threads = [
+        get_all_events, get_hackathon_com_events, get_hacks_ai_events,
+        get_ict2go_events, get_leader_id_events, get_leaders_of_digital_events,
+        get_na_conferencii_events, get_2035_university_events
+    ]
 
     time_start = datetime.now()
     return_rez: list[Event] = []
@@ -45,10 +51,10 @@ def parse_new_events() -> None:
         except Exception as e:
             print("error " + str(e))
             print(e.args)
-            
+
     for event in return_rez:
         clean_event(event)
-        
+
     time_end = datetime.now() - time_start
     print(time_end)
     print(len(return_rez))
